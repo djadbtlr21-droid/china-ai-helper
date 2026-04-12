@@ -4,7 +4,8 @@ const AMAP_KEY = import.meta.env.VITE_AMAP_KEY || '';
 export function isLocationQuery(text) {
   const keywords = ['어디','찾아줘','위치','주소','근처','맛집',
     '식당','병원','약국','마트','카페','호텔','숙소','가게',
-    '있어','알려줘','추천','찾기','어떻게 가'];
+    '있어','알려줘','추천','찾기','어떻게 가','가까운','검색',
+    '고덕지도','지도','amap','찾고싶어','알고싶어','어떤곳'];
   return keywords.some(k => text.includes(k));
 }
 
