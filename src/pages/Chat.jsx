@@ -125,6 +125,26 @@ export default function Chat() {
                 </div>
                 {m.role === 'ai' && chatAmapResults[m.id]?.length > 0 && (
                   <div style={{ maxWidth: '80%', marginLeft: 'calc(1.3rem + 8px)', marginBottom: 12 }}>
+
+                    {/* 바로 길찾기 버튼 - 1순위 장소 */}
+                    <button
+                      onClick={() => openAmapNavi(
+                        chatAmapResults[m.id][0].name,
+                        chatAmapResults[m.id][0].location
+                      )}
+                      style={{
+                        width: '100%', padding: '12px',
+                        background: 'linear-gradient(135deg, #C41E3A, #8B0000)',
+                        color: 'white', border: 'none', borderRadius: 14,
+                        fontSize: '0.88rem', fontWeight: 700,
+                        cursor: 'pointer', marginBottom: 8,
+                        boxShadow: '0 4px 0 rgba(139,0,0,0.4)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+                      }}>
+                      🗺️ 고덕지도로 바로 길찾기 → {chatAmapResults[m.id][0].name}
+                    </button>
+
+                    {/* 나머지 장소 카드들 */}
                     {chatAmapResults[m.id].map((place, j) => (
                       <div key={j} className="card" style={{
                         padding: '10px 14px', marginBottom: 6
@@ -132,7 +152,9 @@ export default function Chat() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <div>
                             <p style={{ margin: '0 0 2px', fontWeight: 700, fontSize: '0.85rem',
-                              color: 'var(--text-primary)' }}>{place.name}</p>
+                              color: 'var(--text-primary)' }}>
+                              {j === 0 ? '🥇 ' : `${j+1}. `}{place.name}
+                            </p>
                             <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                               {place.address}
                             </p>

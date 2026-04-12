@@ -246,6 +246,22 @@ export default function Home() {
             </span>
           </div>
           <div className="gold-divider" />
+
+          {/* 바로 길찾기 버튼 */}
+          <button
+            onClick={() => openAmapNavi(amapPlaces[0].name, amapPlaces[0].location)}
+            style={{
+              width: '100%', padding: '12px',
+              background: 'linear-gradient(135deg, #C41E3A, #8B0000)',
+              color: 'white', border: 'none', borderRadius: 14,
+              fontSize: '0.88rem', fontWeight: 700,
+              cursor: 'pointer', marginBottom: 12,
+              boxShadow: '0 4px 0 rgba(139,0,0,0.4)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
+            }}>
+            🗺️ 고덕지도로 바로 길찾기 → {amapPlaces[0].name}
+          </button>
+
           {amapPlaces.map((place, i) => (
             <div key={i} style={{
               padding: '10px 0',
@@ -255,7 +271,7 @@ export default function Home() {
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: '0 0 3px', fontWeight: 700, fontSize: '0.9rem',
                     color: 'var(--text-primary)' }}>
-                    {place.name}
+                    {i === 0 ? '🥇 ' : `${i+1}. `}{place.name}
                   </p>
                   <p style={{ margin: '0 0 3px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                     📍 {place.address || '주소 없음'}
@@ -270,11 +286,6 @@ export default function Home() {
                       <span style={{ fontSize: '0.72rem', color: 'var(--gold)',
                         background: 'var(--gold-soft)', padding: '2px 8px', borderRadius: 100 }}>
                         ⭐ {place.rating}
-                      </span>
-                    )}
-                    {place.opentime && (
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                        🕐 {place.opentime}
                       </span>
                     )}
                   </div>

@@ -45,6 +45,19 @@ export function formatAmapForPrompt(places) {
 // Open Amap navigation
 export function openAmapNavi(name, location) {
   const [lng, lat] = location.split(',');
-  const webUrl = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=china-ai-helper`;
-  window.open(webUrl, '_blank');
+
+  // Try Amap app deep link first (mobile)
+  const appUrl = `androidamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`;
+  const iosUrl = `iosamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`;
+  const webUrl = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=china-ai-helper&callnative=1`;
+
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+  if (isIOS) {
+    window.location.href = iosUrl;
+    setTimeout(() => window.open(webUrl, '_blank'), 1500);
+  } else {
+    window.location.href = appUrl;
+    setTimeout(() => window.open(webUrl, '_blank'), 1500);
+  }
 }
