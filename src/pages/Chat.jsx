@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { callQwen } from '../services/qwen';
+import { callAI } from '../services/ai';
 import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
 
 const STARTERS = [
@@ -41,7 +41,7 @@ export default function Chat() {
     }
 
     try {
-      const reply = await callQwen(msg, null, amapContext);
+      const reply = await callAI(msg, null, amapContext);
       const msgId = Date.now();
       setMessages(prev => [...prev, { role: 'ai', content: reply, id: msgId }]);
       if (places.length > 0) {
@@ -65,6 +65,13 @@ export default function Chat() {
           fontFamily: 'Noto Serif KR', color: 'var(--cream)' }}>
           💬 AI 채팅
         </h1>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '0 20px 8px' }}>
+        <span style={{ fontSize: '0.68rem', color: 'rgba(212,175,55,0.5)' }}>
+          🤖 Powered by <strong style={{ color: 'var(--gold)' }}>Gemini AI</strong>
+          &nbsp;·&nbsp;Google AI Studio
+        </span>
       </div>
 
       {/* Messages or starters */}

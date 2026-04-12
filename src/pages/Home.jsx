@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Lantern from '../components/Lantern';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Toast from '../components/Toast';
-import { callQwen, compressImage, compressThumbnail, saveHistory } from '../services/qwen';
+import { callAI, compressImage, compressThumbnail, saveHistory } from '../services/ai';
 import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
 
 const QUICK_QUESTIONS = [
@@ -55,7 +55,7 @@ export default function Home() {
         }
       }
 
-      const result = await callQwen(question || null, base64Image, amapContext);
+      const result = await callAI(question || null, base64Image, amapContext);
       setAnswer(result);
     } catch (err) {
       setToast(err.message);
@@ -106,6 +106,16 @@ export default function Home() {
         <p style={{ color: 'rgba(212,175,55,0.6)', fontSize: '0.78rem', marginTop: 8 }}>
           사진으로 무엇이든 물어보세요
         </p>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: 6, margin: '4px 0 8px'
+        }}>
+          <span style={{ fontSize: '0.68rem', color: 'rgba(212,175,55,0.6)' }}>🤖</span>
+          <span style={{ fontSize: '0.68rem', color: 'rgba(212,175,55,0.6)', letterSpacing: '0.05em' }}>
+            Powered by <strong style={{ color: 'var(--gold)' }}>Gemini AI</strong>
+            &nbsp;·&nbsp;Google AI Studio
+          </span>
+        </div>
       </div>
 
       {/* Upload zone */}
@@ -193,6 +203,9 @@ export default function Home() {
             <span style={{ fontSize: '1.2rem' }}>🤖</span>
             <span style={{ fontWeight: 700, color: 'var(--crimson)', fontSize: '0.88rem' }}>
               AI 분석 결과
+            </span>
+            <span style={{ fontSize: '0.65rem', color: 'rgba(212,175,55,0.5)', marginLeft: 'auto' }}>
+              Gemini · Google AI
             </span>
           </div>
           <div className="gold-divider" />

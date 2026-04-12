@@ -22,7 +22,6 @@ export async function searchAmapPlaces(keyword, city = '义乌') {
         tel: p.tel,
         rating: p.biz_ext?.rating || '',
         opentime: p.biz_ext?.open_time || '',
-        distance: p.distance || '',
         location: p.location,
         type: p.type,
       }));
@@ -33,7 +32,7 @@ export async function searchAmapPlaces(keyword, city = '义乌') {
   }
 }
 
-// Format results for Qwen prompt
+// Format results for AI prompt
 export function formatAmapForPrompt(places) {
   if (!places.length) return '';
   return `\n\n[고덕지도(Amap) 실시간 검색 결과]\n` +
@@ -45,8 +44,6 @@ export function formatAmapForPrompt(places) {
 // Open Amap navigation
 export function openAmapNavi(name, location) {
   const [lng, lat] = location.split(',');
-  const url = `androidamap://navi?sourceApplication=china-ai-helper&lat=${lat}&lon=${lng}&dev=0&style=2`;
   const webUrl = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=china-ai-helper`;
-  try { window.location.href = url; } catch(e) {}
-  setTimeout(() => window.open(webUrl, '_blank'), 1000);
+  window.open(webUrl, '_blank');
 }

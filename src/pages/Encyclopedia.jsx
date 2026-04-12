@@ -34,6 +34,13 @@ export default function Encyclopedia({ onAskAI }) {
         </h1>
       </div>
 
+      <div style={{ padding: '0 20px 4px', display: 'flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: '0.65rem', color: 'rgba(212,175,55,0.4)' }}>
+          ✍️ 전문가 검수 데이터 &nbsp;·&nbsp;
+          🤖 AI 질문은 <strong style={{ color: 'var(--gold)' }}>Gemini AI</strong> 제공
+        </span>
+      </div>
+
       {/* Sticky search */}
       <div style={{
         position: 'sticky', top: 0, zIndex: 10,

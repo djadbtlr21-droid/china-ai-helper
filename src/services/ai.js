@@ -1,52 +1,38 @@
 const SYSTEM_PROMPT = `너는 중국 이우(义乌)에 거주하는 한국인을 위한 중국 생활 전문 AI 도우미다.
 반드시 한국어로만 답변하라.
+마크다운 형식(###, **, -, 등) 절대 사용 금지. 일반 텍스트로만 답변하라.
 중국 현지 음식, 의약품, 표지판, 마트 제품, 생활 정보에 대해 깊이 이해하고 있다.
-
-사진이 주어지면:
-- 음식: 요리명, 주재료, 맛 설명, 먹는 방법, 주의사항(알레르기·향신료)
-- 약품: 효능, 복용법, 주의사항, 한국 유사 제품명
-- 표지판/글자: 번역 + 의미 + 필요한 행동
-- 영수증/메뉴판: 항목별 번역과 금액 설명
-- 제품: 용도, 사용법, 주요 성분
-- 위치나 지역: amap 데이터를 참고해 장소 설명
-
-모든 답변은 구체적이고 실용적으로, 최소 200자 이상 작성하라.
+이우(义乌) 지역 특화 정보를 우선적으로 제공하라.
+장소,위치,업체 관련 질문은 amap 데이터를 적극 활용하여 정보를 제공하라.
+답변은 구체적이고 실용적으로, 최소 200자 이상 작성하라.
 모를 경우 솔직하게 말하고 대안을 제시하라.`;
 
-export async function callQwen(question, base64Image = null, amapContext = '') {
-  const key = localStorage.getItem('qwenApiKey');
-  if (!key) throw new Error('설정에서 Qwen API 키를 먼저 입력해주세요 🔑');
+export async function callAI(question, base64Image = null, amapContext = '') {
+  const key = localStorage.getItem('geminiApiKey');
+  if (!key) throw new Error('설정에서 Gemini API 키를 먼저 입력해주세요 🔑');
 
-  const content = [];
+  const parts = [];
   if (base64Image) {
-    content.push({
-      type: 'image_url',
-      image_url: { url: `data:image/jpeg;base64,${base64Image}` }
-    });
+    parts.push({ inline_data: { mime_type: 'image/jpeg', data: base64Image } });
   }
-  content.push({
-    type: 'text',
+  parts.push({
     text: SYSTEM_PROMPT + amapContext + '\n\n질문: ' + (question || '이 사진에 대해 자세히 설명해주세요.')
   });
 
   const res = await fetch(
-    'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`,
     {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'qwen-vl-plus',
-        messages: [{ role: 'user', content }],
-        max_tokens: 1500
+        contents: [{ parts }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
       })
     }
   );
   const data = await res.json();
   if (data.error) throw new Error(data.error.message);
-  return data.choices?.[0]?.message?.content || '응답을 받지 못했습니다.';
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '응답을 받지 못했습니다.';
 }
 
 export async function compressImage(file, maxSize = 800) {
@@ -89,11 +75,9 @@ export function saveHistory(entry) {
   if (list.length > 50) list.pop();
   localStorage.setItem('aiHistory', JSON.stringify(list));
 }
-
 export function getHistory() {
   return JSON.parse(localStorage.getItem('aiHistory') || '[]');
 }
-
 export function deleteHistory(id) {
   const list = getHistory().filter(h => h.id !== id);
   localStorage.setItem('aiHistory', JSON.stringify(list));

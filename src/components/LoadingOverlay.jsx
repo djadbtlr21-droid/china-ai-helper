@@ -21,6 +21,9 @@ export default function LoadingOverlay({ visible }) {
       <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: 4 }}>
         잠시만 기다려주세요
       </p>
+      <p style={{ color: 'rgba(212,175,55,0.45)', fontSize: '0.7rem', marginTop: 8 }}>
+        Powered by Gemini AI · Google
+      </p>
     </div>
   );
 }

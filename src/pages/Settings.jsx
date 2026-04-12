@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 
 export default function Settings() {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('qwenApiKey') || '');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('geminiApiKey') || '');
   const [showKey, setShowKey] = useState(false);
   const [saved, setSaved] = useState(false);
 
   function saveKey() {
-    localStorage.setItem('qwenApiKey', apiKey);
+    localStorage.setItem('geminiApiKey', apiKey);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const isValid = apiKey.startsWith('sk-') && apiKey.length > 20;
+  const isValid = apiKey.startsWith('AIza') && apiKey.length >= 39;
 
   return (
     <div className="page" style={{ background: 'transparent' }}>
@@ -32,10 +32,29 @@ export default function Settings() {
           <span style={{ fontSize: '1.5rem' }}>🔑</span>
           <div>
             <p style={{ fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-              Qwen API 키
+              Gemini API 키
             </p>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
-              Alibaba Cloud DashScope (싱가포르 리전)
+              Google AI Studio (무료)
+            </p>
+          </div>
+        </div>
+
+        {/* Powered by badge */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          padding: '10px 14px',
+          background: 'rgba(212,175,55,0.06)',
+          borderRadius: 10, marginBottom: 14,
+          border: '1px solid rgba(212,175,55,0.15)'
+        }}>
+          <span style={{ fontSize: '1.2rem' }}>🤖</span>
+          <div>
+            <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: 'var(--gold)' }}>
+              Powered by Gemini AI
+            </p>
+            <p style={{ margin: '2px 0 0', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              Google AI Studio · 무료 제공
             </p>
           </div>
         </div>
@@ -43,7 +62,7 @@ export default function Settings() {
         <div style={{ position: 'relative' }}>
           <input type={showKey ? 'text' : 'password'}
             value={apiKey} onChange={e => setApiKey(e.target.value)}
-            placeholder="sk-xxxxxxxxxxxxxxxx"
+            placeholder="AIzaxxxxxxxxxxxxxxxx"
             style={{
               width: '100%', padding: '12px 44px 12px 14px',
               background: 'var(--cream-dark)',
@@ -66,7 +85,7 @@ export default function Settings() {
               background: isValid ? '#34C759' : '#FF3B30'
             }} />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              {isValid ? '유효한 키 형식입니다' : 'sk- 로 시작해야 합니다'}
+              {isValid ? '유효한 키 형식입니다' : 'AIza로 시작해야 합니다'}
             </span>
           </div>
         )}
@@ -108,12 +127,12 @@ export default function Settings() {
         </p>
         <div className="gold-divider" />
         {[
-          '1. international.alibabacloud.com 접속',
-          '2. 회원가입 (이메일 인증)',
-          '3. 상단 메뉴 → 제품 → Model Studio',
-          '4. API Keys 메뉴 → Create API Key',
-          '5. 싱가포르 리전 선택 (중국 본토 차단 없음)',
-          '6. 생성된 키를 위 입력창에 붙여넣기',
+          '1. aistudio.google.com 접속',
+          '2. 로그인 후 \'Get API key\' 클릭',
+          '3. \'Create API key\' 선택',
+          '4. 생성된 키 복사 (AIza로 시작)',
+          '5. 위 입력창에 붙여넣기',
+          '6. 무료로 사용 가능 (분당 15회 제한)',
         ].map(step => (
           <p key={step} style={{
             margin: '0 0 8px', fontSize: '0.83rem',
@@ -129,7 +148,7 @@ export default function Settings() {
           중국생활 AI 도우미
         </p>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0 }}>
-          Powered by Qwen-VL · 이우 한인을 위해 만들어졌습니다
+          Powered by Gemini AI · 이우 한인을 위해 만들어졌습니다
         </p>
         <div className="gold-divider" />
         <p style={{ color: 'var(--text-muted)', fontSize: '0.72rem', margin: 0 }}>

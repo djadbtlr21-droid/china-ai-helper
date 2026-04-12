@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getHistory, deleteHistory } from '../services/qwen';
+import { getHistory, deleteHistory } from '../services/ai';
 
 export default function History() {
   const [history, setHistory] = useState(getHistory);
