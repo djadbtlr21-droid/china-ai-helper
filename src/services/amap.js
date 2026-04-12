@@ -1,4 +1,4 @@
-const AMAP_KEY = '01cd2af677cc41c3cc14e03973279fc3';
+const AMAP_KEY = import.meta.env.VITE_AMAP_KEY || '';
 
 // Detect if question is location-related
 export function isLocationQuery(text) {
