@@ -57,6 +57,12 @@ export default function Home() {
 
       const result = await callAI(question || null, base64Image, amapContext);
       setAnswer(result);
+      saveHistory({
+        type: 'analyze',
+        question: question || '사진 분석',
+        answer: result,
+        thumbnail: thumbnailImage || null
+      });
     } catch (err) {
       setToast(err.message);
       setToastType('error');

@@ -1,113 +1,127 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getHistory, deleteHistory } from '../services/ai';
 
 export default function History() {
-  const [history, setHistory] = useState(getHistory);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    setHistory(getHistory());
+  }, []);
 
   function handleDelete(id) {
     deleteHistory(id);
     setHistory(getHistory());
-    if (selectedItem?.id === id) setSelectedItem(null);
   }
 
-  function formatDate(iso) {
-    const d = new Date(iso);
-    return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  function handleClearAll() {
+    if (confirm('모든 기록을 삭제할까요?')) {
+      localStorage.removeItem('aiHistory');
+      setHistory([]);
+    }
+  }
+
+  if (history.length === 0) {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        height: '80vh', gap: 12
+      }}>
+        <span style={{ fontSize: '3rem' }}>📋</span>
+        <p style={{ color: 'var(--gold)', fontWeight: 700, fontSize: '1rem', margin: 0 }}>
+          저장된 기록이 없습니다
+        </p>
+        <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0 }}>
+          AI 분석/채팅 결과가 자동으로 저장됩니다
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="page" style={{ background: 'transparent' }}>
-      <div style={{ padding: '20px 20px 12px' }}>
-        <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700,
-          color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-          저장된 AI 분석
-        </p>
-        <h1 style={{ margin: '3px 0 0', fontSize: '1.4rem', fontWeight: 700,
-          fontFamily: 'Noto Serif KR', color: 'var(--cream)' }}>
-          📋 기록
+    <div style={{ paddingBottom: 80 }}>
+      {/* Header */}
+      <div style={{ padding: '16px 20px 12px' }}>
+        <h1 style={{
+          fontFamily: 'Noto Serif KR', color: 'var(--cream)',
+          fontSize: '1.5rem', margin: '0 0 4px'
+        }}>
+          📋 AI 기록
         </h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            총 {history.length}개 기록
+          </span>
+          <button onClick={handleClearAll}
+            style={{
+              background: 'none', border: '1px solid rgba(196,30,58,0.3)',
+              borderRadius: 100, padding: '4px 12px',
+              fontSize: '0.72rem', color: 'var(--crimson)',
+              cursor: 'pointer', fontFamily: 'Noto Sans KR'
+            }}>
+            전체 삭제
+          </button>
+        </div>
       </div>
 
-      {history.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <div style={{ fontSize: '3rem', marginBottom: 12 }}>📋</div>
-          <p style={{ color: 'var(--gold)', fontWeight: 700, marginBottom: 6 }}>
-            저장된 기록이 없습니다
-          </p>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-            AI 분석 결과를 저장하면 여기에 쌓입니다
-          </p>
-        </div>
-      ) : (
-        <div style={{ padding: '0 16px' }}>
-          {history.map(h => (
-            <div key={h.id} className="card fade"
-              style={{ marginBottom: 10, padding: 16, cursor: 'pointer', position: 'relative' }}
-              onClick={() => setSelectedItem(h)}>
-              <div style={{ display: 'flex', gap: 12 }}>
-                {h.image && (
-                  <img src={h.image} alt="" style={{
-                    width: 56, height: 56, borderRadius: 10,
-                    objectFit: 'cover', flexShrink: 0
-                  }} />
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: '0 0 2px', fontWeight: 700, fontSize: '0.88rem',
-                    color: 'var(--crimson)', overflow: 'hidden',
-                    textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {h.question}
-                  </p>
-                  <p style={{ margin: '0 0 6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {formatDate(h.date)}
-                  </p>
-                  <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-secondary)',
-                    display: '-webkit-box', WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: 1.5 }}>
-                    {h.answer}
-                  </p>
-                </div>
+      {/* History list */}
+      <div style={{ padding: '0 16px' }}>
+        {history.map((item) => (
+          <div key={item.id} className="card fade"
+            style={{ marginBottom: 12, padding: 16 }}>
+
+            {/* Header row */}
+            <div style={{ display: 'flex', justifyContent: 'space-between',
+              alignItems: 'center', marginBottom: 8 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: '1rem' }}>
+                  {item.type === 'chat' ? '💬' : '🤖'}
+                </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  {new Date(item.date).toLocaleDateString('ko-KR', {
+                    month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                  })}
+                </span>
               </div>
-              <button onClick={e => { e.stopPropagation(); handleDelete(h.id); }}
+              <button onClick={() => handleDelete(item.id)}
                 style={{
-                  position: 'absolute', top: 10, right: 10,
                   background: 'none', border: 'none',
                   color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1rem'
-                }}>🗑</button>
+                }}>
+                🗑
+              </button>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Detail modal */}
-      {selectedItem && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 200,
-          background: 'rgba(26,16,8,0.85)', backdropFilter: 'blur(8px)'
-        }} onClick={() => setSelectedItem(null)}>
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            background: 'var(--cream)', borderRadius: '24px 24px 0 0',
-            padding: '20px 20px 48px', maxHeight: '88vh', overflowY: 'auto'
-          }} onClick={e => e.stopPropagation()}>
-            <div style={{ width: 40, height: 4, borderRadius: 2,
-              background: 'var(--card-border)', margin: '0 auto 16px' }} />
-            <h3 style={{ color: 'var(--crimson)', margin: '0 0 8px', fontSize: '1rem' }}>
-              {selectedItem.question}
-            </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem', margin: '0 0 12px' }}>
-              {new Date(selectedItem.date).toLocaleString('ko-KR')}
+            {/* Thumbnail */}
+            {item.thumbnail && (
+              <img src={item.thumbnail} alt=""
+                style={{ width: '100%', height: 120, objectFit: 'cover',
+                  borderRadius: 10, marginBottom: 10 }} />
+            )}
+
+            {/* Question */}
+            {item.question && (
+              <p style={{
+                margin: '0 0 6px', fontSize: '0.82rem',
+                color: 'var(--gold)', fontWeight: 600
+              }}>
+                Q. {item.question}
+              </p>
+            )}
+
+            {/* Answer preview */}
+            <p style={{
+              margin: 0, fontSize: '0.82rem',
+              color: 'var(--text-secondary)', lineHeight: 1.6,
+              display: '-webkit-box', WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical', overflow: 'hidden'
+            }}>
+              {item.answer}
             </p>
-            <div className="gold-divider" />
-            <p style={{ color: 'var(--text-primary)', lineHeight: 1.8,
-              fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>
-              {selectedItem.answer}
-            </p>
-            <button className="btn-primary" style={{ width: '100%', marginTop: 16 }}
-              onClick={() => setSelectedItem(null)}>닫기</button>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

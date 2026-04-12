@@ -1,11 +1,13 @@
-const AMAP_KEY = import.meta.env.VITE_AMAP_KEY || '';
+const AMAP_KEY = import.meta.env.VITE_AMAP_KEY || '01cd2af677cc41c3cc14e03973279fc3';
 
 // Detect if question is location-related
 export function isLocationQuery(text) {
   const keywords = ['어디','찾아줘','위치','주소','근처','맛집',
     '식당','병원','약국','마트','카페','호텔','숙소','가게',
     '있어','알려줘','추천','찾기','어떻게 가','가까운','검색',
-    '고덕지도','지도','amap','찾고싶어','알고싶어','어떤곳'];
+    '지도','찾고싶어','알고싶어','어떤곳','한국식당','한식',
+    '이우','베이위안','단시로','초솔로','푸텐','커피','빵집',
+    '편의점','세탁','미용실','네일','마사지'];
   return keywords.some(k => text.includes(k));
 }
 
@@ -45,19 +47,11 @@ export function formatAmapForPrompt(places) {
 // Open Amap navigation
 export function openAmapNavi(name, location) {
   const [lng, lat] = location.split(',');
-
-  // Try Amap app deep link first (mobile)
-  const appUrl = `androidamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`;
-  const iosUrl = `iosamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`;
   const webUrl = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=china-ai-helper&callnative=1`;
-
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-
-  if (isIOS) {
-    window.location.href = iosUrl;
-    setTimeout(() => window.open(webUrl, '_blank'), 1500);
-  } else {
-    window.location.href = appUrl;
-    setTimeout(() => window.open(webUrl, '_blank'), 1500);
-  }
+  const appUrl = isIOS
+    ? `iosamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`
+    : `androidamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`;
+  window.location.href = appUrl;
+  setTimeout(() => window.open(webUrl, '_blank'), 1500);
 }
