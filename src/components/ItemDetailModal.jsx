@@ -22,10 +22,18 @@ export default function ItemDetailModal({ item, onClose }) {
           background: 'var(--card-border)', margin: '0 auto 16px'
         }} />
 
-        {/* Emoji */}
-        <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: 8 }}>
-          {item.emoji}
-        </div>
+        {/* Emoji or user image */}
+        {item.userImage ? (
+          <img src={item.userImage} alt=""
+            style={{
+              width: 100, height: 100, borderRadius: 16,
+              objectFit: 'cover', margin: '0 auto 8px', display: 'block'
+            }} />
+        ) : (
+          <div style={{ fontSize: '3rem', textAlign: 'center', marginBottom: 8 }}>
+            {item.emoji}
+          </div>
+        )}
 
         {/* Name */}
         <h2 style={{
@@ -68,7 +76,7 @@ export default function ItemDetailModal({ item, onClose }) {
 
         {/* Tags */}
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 20 }}>
-          {item.tags.map(tag => (
+          {item.tags?.map(tag => (
             <span key={tag} className="tag">#{tag}</span>
           ))}
         </div>
