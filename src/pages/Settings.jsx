@@ -77,8 +77,32 @@ export default function Settings() {
         </button>
       </div>
 
-      {/* Guide */}
+      {/* Amap info card */}
       <div className="card fade fade-2" style={{ margin: '0 16px 14px', padding: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <span style={{ fontSize: '1.5rem' }}>🗺️</span>
+          <div>
+            <p style={{ fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+              고덕지도 (Amap) API
+            </p>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>
+              장소 검색 · 길찾기 연동
+            </p>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#34C759' }} />
+            <span style={{ fontSize: '0.75rem', color: '#34C759', fontWeight: 700 }}>연동됨</span>
+          </div>
+        </div>
+        <div className="gold-divider" />
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
+          위치 관련 질문 시 자동으로 실시간 장소 데이터를 검색합니다.<br/>
+          예: "근처 한국 식당 알려줘", "이우에 병원 어디 있어?"
+        </p>
+      </div>
+
+      {/* Guide */}
+      <div className="card fade fade-3" style={{ margin: '0 16px 14px', padding: 18 }}>
         <p style={{ fontWeight: 700, color: 'var(--gold)', margin: '0 0 12px', fontSize: '0.9rem' }}>
           🔗 API 키 무료 발급 방법
         </p>
@@ -99,7 +123,7 @@ export default function Settings() {
       </div>
 
       {/* App info */}
-      <div className="card fade fade-3" style={{ margin: '0 16px', padding: 18, textAlign: 'center' }}>
+      <div className="card fade fade-4" style={{ margin: '0 16px', padding: 18, textAlign: 'center' }}>
         <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🏮</div>
         <p style={{ color: 'var(--gold)', fontWeight: 700, margin: '0 0 4px', fontSize: '1rem' }}>
           중국생활 AI 도우미

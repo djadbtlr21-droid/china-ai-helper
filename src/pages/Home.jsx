@@ -3,6 +3,7 @@ import Lantern from '../components/Lantern';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Toast from '../components/Toast';
 import { callQwen, compressImage, compressThumbnail, saveHistory } from '../services/qwen';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
 
 const QUICK_QUESTIONS = [
   { icon: '🍜', label: '이게 무슨 음식?' },
@@ -22,6 +23,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState('');
   const [toastType, setToastType] = useState('error');
+  const [amapPlaces, setAmapPlaces] = useState([]);
   const fileInputRef = useRef(null);
 
   async function handleImageSelect(e) {
@@ -39,8 +41,21 @@ export default function Home() {
     if (!selectedImage && !question.trim()) return;
     setLoading(true);
     setAnswer('');
+    setAmapPlaces([]);
     try {
-      const result = await callQwen(question || null, base64Image);
+      let amapContext = '';
+      let places = [];
+
+      // If location query, search Amap first
+      if (question && isLocationQuery(question)) {
+        places = await searchAmapPlaces(question);
+        if (places.length > 0) {
+          amapContext = formatAmapForPrompt(places);
+          setAmapPlaces(places);
+        }
+      }
+
+      const result = await callQwen(question || null, base64Image, amapContext);
       setAnswer(result);
     } catch (err) {
       setToast(err.message);
@@ -202,6 +217,71 @@ export default function Home() {
               🔄 새 질문
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Amap place results */}
+      {amapPlaces.length > 0 && (
+        <div className="card fade" style={{ margin: '0 16px 16px', padding: 18 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <span style={{ fontSize: '1.1rem' }}>📍</span>
+            <span style={{ fontWeight: 700, color: 'var(--crimson)', fontSize: '0.88rem' }}>
+              고덕지도 검색 결과
+            </span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+              실시간
+            </span>
+          </div>
+          <div className="gold-divider" />
+          {amapPlaces.map((place, i) => (
+            <div key={i} style={{
+              padding: '10px 0',
+              borderBottom: i < amapPlaces.length - 1 ? '1px solid var(--card-border)' : 'none'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: '0 0 3px', fontWeight: 700, fontSize: '0.9rem',
+                    color: 'var(--text-primary)' }}>
+                    {place.name}
+                  </p>
+                  <p style={{ margin: '0 0 3px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                    📍 {place.address || '주소 없음'}
+                  </p>
+                  {place.tel && (
+                    <p style={{ margin: '0 0 3px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      📞 {place.tel}
+                    </p>
+                  )}
+                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+                    {place.rating && (
+                      <span style={{ fontSize: '0.72rem', color: 'var(--gold)',
+                        background: 'var(--gold-soft)', padding: '2px 8px', borderRadius: 100 }}>
+                        ⭐ {place.rating}
+                      </span>
+                    )}
+                    {place.opentime && (
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        🕐 {place.opentime}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {place.location && (
+                  <button
+                    onClick={() => openAmapNavi(place.name, place.location)}
+                    style={{
+                      background: 'linear-gradient(135deg, var(--crimson), var(--crimson-dark))',
+                      color: 'white', border: 'none', borderRadius: 100,
+                      padding: '8px 14px', fontSize: '0.75rem', fontWeight: 700,
+                      cursor: 'pointer', flexShrink: 0, marginLeft: 8,
+                      boxShadow: '0 3px 0 rgba(139,0,0,0.3)'
+                    }}>
+                    🗺️ 길찾기
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

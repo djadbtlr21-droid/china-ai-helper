@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { callQwen } from '../services/qwen';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
 
 const STARTERS = [
   '이우에서 병원 가려면 어떻게 해?',
@@ -16,6 +17,7 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [chatAmapResults, setChatAmapResults] = useState({});
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -28,9 +30,23 @@ export default function Chat() {
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: msg }]);
     setLoading(true);
+
+    let amapContext = '';
+    let places = [];
+    if (isLocationQuery(msg)) {
+      places = await searchAmapPlaces(msg);
+      if (places.length > 0) {
+        amapContext = formatAmapForPrompt(places);
+      }
+    }
+
     try {
-      const reply = await callQwen(msg);
-      setMessages(prev => [...prev, { role: 'ai', content: reply }]);
+      const reply = await callQwen(msg, null, amapContext);
+      const msgId = Date.now();
+      setMessages(prev => [...prev, { role: 'ai', content: reply, id: msgId }]);
+      if (places.length > 0) {
+        setChatAmapResults(prev => ({ ...prev, [msgId]: places }));
+      }
     } catch (err) {
       setMessages(prev => [...prev, { role: 'ai', content: '⚠️ ' + err.message }]);
     }
@@ -76,29 +92,63 @@ export default function Chat() {
         ) : (
           <>
             {messages.map((m, i) => (
-              <div key={i} style={{
-                display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
-                marginBottom: 12
-              }}>
-                {m.role === 'ai' && (
-                  <span style={{ fontSize: '1.3rem', marginRight: 8, alignSelf: 'flex-end' }}>🏮</span>
-                )}
+              <React.Fragment key={i}>
                 <div style={{
-                  maxWidth: '80%', padding: '12px 16px', borderRadius: 16,
-                  background: m.role === 'user'
-                    ? 'linear-gradient(135deg, var(--crimson), var(--crimson-dark))'
-                    : 'var(--card-bg)',
-                  color: m.role === 'user' ? 'white' : 'var(--text-primary)',
-                  fontSize: '0.88rem', lineHeight: 1.7,
-                  boxShadow: 'var(--card-shadow)',
-                  border: m.role === 'ai' ? '1px solid var(--card-border)' : 'none',
-                  whiteSpace: 'pre-wrap',
-                  borderBottomRightRadius: m.role === 'user' ? 4 : 16,
-                  borderBottomLeftRadius: m.role === 'ai' ? 4 : 16,
+                  display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
+                  marginBottom: 12
                 }}>
-                  {m.content}
+                  {m.role === 'ai' && (
+                    <span style={{ fontSize: '1.3rem', marginRight: 8, alignSelf: 'flex-end' }}>🏮</span>
+                  )}
+                  <div style={{
+                    maxWidth: '80%', padding: '12px 16px', borderRadius: 16,
+                    background: m.role === 'user'
+                      ? 'linear-gradient(135deg, var(--crimson), var(--crimson-dark))'
+                      : 'var(--card-bg)',
+                    color: m.role === 'user' ? 'white' : 'var(--text-primary)',
+                    fontSize: '0.88rem', lineHeight: 1.7,
+                    boxShadow: 'var(--card-shadow)',
+                    border: m.role === 'ai' ? '1px solid var(--card-border)' : 'none',
+                    whiteSpace: 'pre-wrap',
+                    borderBottomRightRadius: m.role === 'user' ? 4 : 16,
+                    borderBottomLeftRadius: m.role === 'ai' ? 4 : 16,
+                  }}>
+                    {m.content}
+                  </div>
                 </div>
-              </div>
+                {m.role === 'ai' && chatAmapResults[m.id]?.length > 0 && (
+                  <div style={{ maxWidth: '80%', marginLeft: 'calc(1.3rem + 8px)', marginBottom: 12 }}>
+                    {chatAmapResults[m.id].map((place, j) => (
+                      <div key={j} className="card" style={{
+                        padding: '10px 14px', marginBottom: 6
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <p style={{ margin: '0 0 2px', fontWeight: 700, fontSize: '0.85rem',
+                              color: 'var(--text-primary)' }}>{place.name}</p>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                              {place.address}
+                            </p>
+                            {place.rating && (
+                              <span style={{ fontSize: '0.7rem', color: 'var(--gold)' }}>⭐ {place.rating}</span>
+                            )}
+                          </div>
+                          {place.location && (
+                            <button onClick={() => openAmapNavi(place.name, place.location)}
+                              style={{
+                                background: 'var(--crimson)', color: 'white', border: 'none',
+                                borderRadius: 100, padding: '6px 12px', fontSize: '0.72rem',
+                                fontWeight: 700, cursor: 'pointer', flexShrink: 0, marginLeft: 8
+                              }}>
+                              🗺️ 길찾기
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </React.Fragment>
             ))}
             {loading && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>

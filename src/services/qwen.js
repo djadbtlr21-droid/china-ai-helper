@@ -13,9 +13,9 @@ const SYSTEM_PROMPT = `너는 중국 이우(义乌)에 거주하는 한국인을
 모든 답변은 구체적이고 실용적으로, 최소 200자 이상 작성하라.
 모를 경우 솔직하게 말하고 대안을 제시하라.`;
 
-export async function callQwen(question, base64Image = null) {
+export async function callQwen(question, base64Image = null, amapContext = '') {
   const key = localStorage.getItem('qwenApiKey');
-  if (!key) throw new Error('설정에서 API 키를 먼저 입력해주세요 🔑');
+  if (!key) throw new Error('설정에서 Qwen API 키를 먼저 입력해주세요 🔑');
 
   const content = [];
   if (base64Image) {
@@ -26,7 +26,7 @@ export async function callQwen(question, base64Image = null) {
   }
   content.push({
     type: 'text',
-    text: SYSTEM_PROMPT + '\n\n질문: ' + (question || '이 사진에 대해 자세히 설명해주세요.')
+    text: SYSTEM_PROMPT + amapContext + '\n\n질문: ' + (question || '이 사진에 대해 자세히 설명해주세요.')
   });
 
   const res = await fetch(
