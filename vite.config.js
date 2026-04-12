@@ -8,8 +8,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: '중국생활 AI 도우미',
-        short_name: '중국AI',
+        name: '이우생활 AI 도우미',
+        short_name: '이우생활 AI 도우미',
         description: '이우 한인을 위한 AI 생활 도우미',
         theme_color: '#C41E3A',
         background_color: '#1A1008',
