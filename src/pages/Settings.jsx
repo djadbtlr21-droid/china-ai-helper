@@ -27,7 +27,7 @@ export default function Settings() {
       </div>
 
       {/* API Key */}
-      <div className="card fade fade-1" style={{ margin: '0 16px 14px', padding: 20 }}>
+      <div className="card fade fade-1" style={{ margin: '0 10px 14px', padding: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
           <span style={{ fontSize: '1.5rem' }}>🔑</span>
           <div>
@@ -97,7 +97,7 @@ export default function Settings() {
       </div>
 
       {/* Amap info card */}
-      <div className="card fade fade-2" style={{ margin: '0 16px 14px', padding: 18 }}>
+      <div className="card fade fade-2" style={{ margin: '0 10px 14px', padding: 18 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <span style={{ fontSize: '1.5rem' }}>🗺️</span>
           <div>
@@ -121,7 +121,7 @@ export default function Settings() {
       </div>
 
       {/* Guide */}
-      <div className="card fade fade-3" style={{ margin: '0 16px 14px', padding: 18 }}>
+      <div className="card fade fade-3" style={{ margin: '0 10px 14px', padding: 18 }}>
         <p style={{ fontWeight: 700, color: 'var(--gold)', margin: '0 0 12px', fontSize: '0.9rem' }}>
           🔗 API 키 무료 발급 방법
         </p>
@@ -142,7 +142,7 @@ export default function Settings() {
       </div>
 
       {/* App info */}
-      <div className="card fade fade-4" style={{ margin: '0 16px', padding: 18, textAlign: 'center' }}>
+      <div className="card fade fade-4" style={{ margin: '0 10px', padding: 18, textAlign: 'center' }}>
         <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🏮</div>
         <p style={{ color: 'var(--gold)', fontWeight: 700, margin: '0 0 4px', fontSize: '1rem' }}>
           중국생활 AI 도우미

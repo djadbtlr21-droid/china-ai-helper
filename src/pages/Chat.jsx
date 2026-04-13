@@ -52,6 +52,10 @@ export default function Chat() {
     '이우에 병원 어디있어?',
     '단시로에 카페 알려줘',
     '마라탕 어디가 맛있어?',
+    '푸텐 시장 어떻게 가?',
+    '베이위안 근처 마트 있어?',
+    '이우 국제상품성 가는 법',
+    '한국 식품 파는 곳 알려줘',
   ];
 
   return (
@@ -92,7 +96,7 @@ export default function Chat() {
       <div style={{
         flex: 1,
         overflowY: 'auto',
-        padding: '8px 16px',
+        padding: '8px 10px',
         display: 'flex',
         flexDirection: 'column',
         gap: 8
@@ -250,7 +254,7 @@ export default function Chat() {
 
       {/* Input - fixed at bottom */}
       <div style={{
-        padding: '10px 16px',
+        padding: '10px 10px',
         background: 'rgba(26,16,8,0.95)',
         backdropFilter: 'blur(10px)',
         borderTop: '1px solid var(--card-border)',
@@ -282,16 +286,21 @@ export default function Chat() {
             onClick={() => sendMessage()}
             disabled={!input.trim() || loading}
             style={{
-              width: 46, height: 46, borderRadius: '50%',
+              borderRadius: 24,
+              padding: '10px 18px',
               background: input.trim() && !loading
                 ? 'linear-gradient(135deg, var(--crimson), var(--crimson-dark))'
                 : 'rgba(255,255,255,0.1)',
               border: 'none', cursor: input.trim() && !loading ? 'pointer' : 'default',
-              fontSize: '1.2rem', display: 'flex',
+              fontSize: '0.85rem', fontWeight: 700,
+              fontFamily: 'Noto Sans KR',
+              color: 'white',
+              display: 'flex',
               alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0, transition: 'all 0.2s'
+              flexShrink: 0, transition: 'all 0.2s',
+              whiteSpace: 'nowrap',
             }}>
-            {loading ? '⏳' : '🚀'}
+            {loading ? '⏳' : '보내기'}
           </button>
         </div>
       </div>

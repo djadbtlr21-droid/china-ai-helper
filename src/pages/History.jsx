@@ -65,7 +65,7 @@ export default function History() {
       </div>
 
       {/* History list */}
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '0 10px' }}>
         {history.map((item) => (
           <div key={item.id} className="card fade"
             style={{ marginBottom: 12, padding: 16 }}>

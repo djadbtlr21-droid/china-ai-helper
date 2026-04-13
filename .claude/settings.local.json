@@ -10,7 +10,11 @@
       "Bash(npx tailwindcss@3 init -p)",
       "Bash(npm run:*)",
       "Bash(mv postcss.config.js postcss.config.cjs)",
-      "Bash(mv tailwind.config.js tailwind.config.cjs)"
+      "Bash(mv tailwind.config.js tailwind.config.cjs)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(npx vite:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)"
     ]
   }
 }

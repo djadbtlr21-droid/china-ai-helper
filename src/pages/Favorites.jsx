@@ -30,7 +30,7 @@ export default function Favorites() {
 
       {/* Category Pills */}
       <div style={{
-        display: 'flex', gap: 8, padding: '0 16px 12px',
+        display: 'flex', gap: 8, padding: '0 10px 12px',
         overflowX: 'auto', scrollbarWidth: 'none'
       }}>
         {placeCategories.map(cat => (
@@ -59,14 +59,15 @@ export default function Favorites() {
       </div>
 
       {/* Place Cards */}
-      <div style={{ padding: '0 16px' }}>
+      <div style={{ padding: '0 10px' }}>
         {filtered.length === 0 ? (
           <div style={{
             textAlign: 'center', padding: '60px 20px',
             color: 'var(--text-muted)'
           }}>
             <p style={{ fontSize: '2rem', margin: '0 0 12px' }}>📍</p>
-            <p style={{ fontSize: '0.88rem' }}>등록된 장소가 없습니다</p>
+            <p>장소를 추가해주세요</p>
+            <p style={{ fontSize:'0.78rem' }}>생활반경 데이터를 곧 업데이트할 예정입니다</p>
           </div>
         ) : (
           filtered.map(place => (

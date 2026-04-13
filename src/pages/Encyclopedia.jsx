@@ -235,14 +235,14 @@ export default function Encyclopedia({ onAskAI }) {
         position: 'sticky', top: 0, zIndex: 10,
         background: 'rgba(26,16,8,0.96)',
         backdropFilter: 'blur(16px)',
-        padding: '10px 16px',
+        padding: '10px 10px',
         borderBottom: '1px solid rgba(212,175,55,0.12)'
       }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
           background: 'rgba(253,246,227,0.08)',
           border: '1px solid rgba(212,175,55,0.25)',
-          borderRadius: 100, padding: '10px 16px'
+          borderRadius: 100, padding: '10px 10px'
         }}>
           <span style={{ color: 'var(--gold)', fontSize: '1rem' }}>🔍</span>
           <input value={search} onChange={e => setSearch(e.target.value)}
@@ -266,7 +266,7 @@ export default function Encyclopedia({ onAskAI }) {
       {/* Category pills */}
       <div style={{
         display: 'flex', gap: 8, overflowX: 'auto',
-        padding: '12px 16px 8px', scrollbarWidth: 'none'
+        padding: '12px 10px 8px', scrollbarWidth: 'none'
       }}>
         {[{ id: 'all', label: '전체', emoji: '🔎' }, ...categories].map(cat => (
           <button key={cat.id}
@@ -288,7 +288,7 @@ export default function Encyclopedia({ onAskAI }) {
       </div>
 
       {/* Result count + add button */}
-      <div style={{ padding: '4px 16px 8px',
+      <div style={{ padding: '4px 10px 8px',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           총 {filtered.length}개 항목
@@ -316,7 +316,7 @@ export default function Encyclopedia({ onAskAI }) {
           </button>
         </div>
       ) : (
-        <div style={{ padding: '0 16px' }}>
+        <div style={{ padding: '0 10px' }}>
           {filtered.map((item, i) => (
             <div key={item.id}
               className={`card fade fade-${Math.min(i + 1, 6)}`}

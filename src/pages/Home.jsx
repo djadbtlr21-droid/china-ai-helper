@@ -5,13 +5,17 @@ import Toast from '../components/Toast';
 import { callAI, compressImage, compressThumbnail, saveHistory } from '../services/ai';
 import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
 
-const QUICK_QUESTIONS = [
-  { icon: '🍜', label: '이게 무슨 음식?' },
-  { icon: '💊', label: '이 약 어떻게 먹어?' },
-  { icon: '🪧', label: '무슨 뜻이야?' },
-  { icon: '🧾', label: '영수증 번역해줘' },
-  { icon: '📦', label: '이 제품 뭐야?' },
-  { icon: '🏥', label: '병원 어떻게 가?' },
+const quickQuestions = [
+  { emoji: '🍜', text: '이게 무슨 음식?' },
+  { emoji: '💊', text: '이 약 어떻게 먹어?' },
+  { emoji: '🏪', text: '무슨 뜻이야?' },
+  { emoji: '🛒', text: '이 제품 어디서 사?' },
+  { emoji: '🌶', text: '얼마나 매워?' },
+  { emoji: '📦', text: '유통기한 확인해줘' },
+  { emoji: '🧾', text: '영수증 해석해줘' },
+  { emoji: '🏥', text: '이 약 부작용은?' },
+  { emoji: '🍱', text: '칼로리 알려줘' },
+  { emoji: '💰', text: '가격이 적당해?' },
 ];
 
 export default function Home() {
@@ -125,7 +129,7 @@ export default function Home() {
       </div>
 
       {/* Upload zone */}
-      <div className="card fade fade-1" style={{ margin: '0 16px 12px', padding: 16 }}>
+      <div className="card fade fade-1" style={{ margin: '0 10px 12px', padding: 16 }}>
         <input type="file" accept="image/*" capture="environment"
           style={{ display: 'none' }} ref={fileInputRef}
           onChange={handleImageSelect} />
@@ -164,21 +168,35 @@ export default function Home() {
         )}
       </div>
 
-      {/* Quick question chips */}
-      <div style={{
-        display: 'flex', gap: 8, overflowX: 'auto',
-        padding: '0 16px 4px', scrollbarWidth: 'none'
+      {/* Quick question carousel */}
+      <div className="fade fade-2" style={{
+        overflow: 'hidden',
+        padding: '0 10px 4px',
+        WebkitMaskImage: 'linear-gradient(to right, transparent, white 10%, white 90%, transparent)',
+        maskImage: 'linear-gradient(to right, transparent, white 10%, white 90%, transparent)',
       }}>
-        {QUICK_QUESTIONS.map(q => (
-          <button key={q.label} className="btn-gold fade fade-2"
-            onClick={() => setQuestion(q.label)}>
-            {q.icon} {q.label}
-          </button>
-        ))}
+        <div style={{
+          display: 'flex', gap: 8, whiteSpace: 'nowrap',
+          animation: 'scrollLeft 20s linear infinite',
+          width: 'max-content',
+        }}>
+          {[...quickQuestions, ...quickQuestions].map((q, i) => (
+            <button key={i} onClick={() => setQuestion(q.text)}
+              style={{
+                background: 'linear-gradient(135deg, var(--gold-light), var(--gold))',
+                color: 'var(--crimson)', border: 'none', borderRadius: 100,
+                padding: '8px 16px', fontSize: '0.82rem', whiteSpace: 'nowrap',
+                flexShrink: 0, cursor: 'pointer', fontFamily: 'Noto Sans KR',
+                fontWeight: 700,
+              }}>
+              {q.emoji} {q.text}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Text input */}
-      <div className="card fade fade-3" style={{ margin: '10px 16px', padding: '12px 16px' }}>
+      <div className="card fade fade-3" style={{ margin: '10px 10px', padding: '12px 16px' }}>
         <textarea
           value={question}
           onChange={e => setQuestion(e.target.value)}
@@ -193,7 +211,7 @@ export default function Home() {
       </div>
 
       {/* Analyze button */}
-      <div style={{ padding: '0 16px 12px' }}>
+      <div style={{ padding: '0 10px 12px' }}>
         <button className="btn-primary fade fade-4"
           onClick={handleAnalyze}
           disabled={loading || (!selectedImage && !question.trim())}
@@ -204,7 +222,7 @@ export default function Home() {
 
       {/* Result */}
       {answer && (
-        <div className="card fade" style={{ margin: '0 16px 16px', padding: 18 }}>
+        <div className="card fade" style={{ margin: '0 10px 16px', padding: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <span style={{ fontSize: '1.2rem' }}>🤖</span>
             <span style={{ fontWeight: 700, color: 'var(--crimson)', fontSize: '0.88rem' }}>
@@ -241,7 +259,7 @@ export default function Home() {
 
       {/* Amap place results */}
       {amapPlaces.length > 0 && (
-        <div className="card fade" style={{ margin: '0 16px 16px', padding: 18 }}>
+        <div className="card fade" style={{ margin: '0 10px 16px', padding: 18 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <span style={{ fontSize: '1.1rem' }}>📍</span>
             <span style={{ fontWeight: 700, color: 'var(--crimson)', fontSize: '0.88rem' }}>

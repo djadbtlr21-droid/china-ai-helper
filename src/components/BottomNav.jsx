@@ -2,9 +2,9 @@ import React from 'react';
 
 const tabs = [
   { id: 'home',         icon: '📸', label: 'AI분석' },
-  { id: 'encyclopedia', icon: '📚', label: '백과사전' },
-  { id: 'chat',         icon: '💬', label: '채팅' },
+  { id: 'chat',         icon: '💬', label: 'AI채팅' },
   { id: 'history',      icon: '📋', label: '기록' },
+  { id: 'encyclopedia', icon: '📚', label: '백과사전' },
   { id: 'favorites',    icon: '⭐', label: '즐겨찾기' },
   { id: 'settings',     icon: '⚙️', label: '설정' },
 ];

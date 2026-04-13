@@ -104,6 +104,10 @@ body::before {
   0%, 100% { opacity: 0.3; transform: scale(0.8); }
   50%      { opacity: 1; transform: scale(1.2); }
 }
+@keyframes scrollLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
 
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
