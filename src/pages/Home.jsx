@@ -100,12 +100,20 @@ export default function Home() {
 
       {/* Header */}
       <header style={{ padding: '20px 20px 8px' }}>
-        <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700,
-          color: 'white', letterSpacing: '0.02em' }}>
-          이우 거주 한인을 위한
+        <p style={{
+          color: 'white',
+          fontWeight: 700,
+          fontSize: '0.9rem',
+          textAlign: 'center',
+          display: 'block',
+          marginBottom: 6,
+          width: '100%',
+          margin: '0 0 6px',
+        }}>
+          "이우 거주 한인을 위한"
         </p>
-        <h1 style={{ margin: '3px 0 0', fontSize: '1.4rem', fontWeight: 700,
-          fontFamily: 'Noto Serif KR', color: 'var(--cream)', letterSpacing: '-0.01em' }}>
+        <h1 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 700,
+          fontFamily: 'Noto Serif KR', color: 'var(--cream)', letterSpacing: '-0.01em', textAlign: 'center' }}>
           🏮 중국생활 AI 도우미
         </h1>
       </header>

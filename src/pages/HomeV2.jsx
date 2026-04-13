@@ -99,12 +99,18 @@ export default function HomeV2() {
       {/* Header */}
       <header style={{ padding: '24px 20px 12px' }}>
         <p className="v2-animate" style={{
-          margin: 0, fontSize: '0.82rem', fontWeight: 700,
-          color: 'white', letterSpacing: '0.02em'
+          color: 'white',
+          fontWeight: 700,
+          fontSize: '0.9rem',
+          textAlign: 'center',
+          display: 'block',
+          marginBottom: 6,
+          width: '100%',
+          margin: '0 0 6px',
         }}>
-          이우 거주 한인을 위한
+          "이우 거주 한인을 위한"
         </p>
-        <h1 className="v2-heading v2-animate v2-animate-delay-1" style={{ fontSize: '1.6rem', margin: '4px 0 0' }}>
+        <h1 className="v2-heading v2-animate v2-animate-delay-1" style={{ fontSize: '1.6rem', margin: 0, textAlign: 'center' }}>
           🏮 중국생활 AI 도우미
         </h1>
       </header>
