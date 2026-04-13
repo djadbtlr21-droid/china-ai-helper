@@ -73,18 +73,14 @@ export function formatAmapForPrompt(places) {
 export function openAmapSearch(keyword) {
   const encoded = encodeURIComponent(keyword);
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const webUrl = `https://uri.amap.com/search?keyword=${encoded}&city=义乌&src=china-ai-helper&callnative=1`;
-  const appUrlAndroid = `androidamap://poi?sourceApplication=china-ai-helper&keywords=${encoded}&dev=0`;
-  const appUrlIOS = `iosamap://poi?sourceApplication=china-ai-helper&keywords=${encoded}&dev=0`;
 
   if (isIOS) {
-    window.location.href = appUrlIOS;
+    window.location.href = `iosamap://poi?sourceApplication=china-ai-helper&keywords=${encoded}&dev=0`;
   } else {
-    window.location.href = appUrlAndroid;
+    window.location.href = `androidamap://poi?sourceApplication=china-ai-helper&keywords=${encoded}&dev=0`;
   }
-  setTimeout(() => window.open(webUrl, '_blank'), 1500);
 }
 
-export function openAmapNavi(name, location) {
+export function openAmapNavi(name) {
   openAmapSearch(name);
 }

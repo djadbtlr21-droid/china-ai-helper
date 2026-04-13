@@ -131,20 +131,61 @@ export default function Favorites() {
             <div key={place.id} className="card fade"
               style={{ marginBottom: 10, padding: 0, overflow: 'hidden' }}>
 
-              {/* Image area */}
-              {place.images?.[0] ? (
-                <img src={place.images[0]} alt={place.nameKo}
-                  style={{ width: '100%', height: 140, objectFit: 'cover' }} />
-              ) : (
-                <div style={{
-                  width: '100%', height: 80,
-                  background: 'linear-gradient(135deg, rgba(196,30,58,0.15), rgba(212,175,55,0.1))',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '2.5rem'
-                }}>
-                  {catEmoji}
-                </div>
-              )}
+              {/* Image area - always show, placeholder if no image */}
+              <div style={{
+                width: '100%',
+                height: 160,
+                background: place.images?.[0]
+                  ? 'transparent'
+                  : 'linear-gradient(135deg, rgba(196,30,58,0.12), rgba(212,175,55,0.08))',
+                overflow: 'hidden',
+                borderRadius: '14px 14px 0 0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                position: 'relative'
+              }}>
+                {place.images?.[0] ? (
+                  <img
+                    src={place.images[0]}
+                    alt={place.nameKo}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                    onError={e => {
+                      e.target.style.display = 'none';
+                      e.target.parentElement.style.background =
+                        'linear-gradient(135deg, rgba(196,30,58,0.12), rgba(212,175,55,0.08))';
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 8,
+                    opacity: 0.4
+                  }}>
+                    <span style={{ fontSize: '2.5rem' }}>
+                      {place.category === '식당' ? '🍽️' :
+                       place.category === '운동' ? '💪' :
+                       place.category === '마사지' ? '💆' :
+                       place.category === '쇼핑' ? '🛍️' :
+                       place.category === '집/회사' ? '🏠' : '📍'}
+                    </span>
+                    <span style={{
+                      fontSize: '0.72rem',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'Noto Sans KR'
+                    }}>
+                      이미지 준비 중
+                    </span>
+                  </div>
+                )}
+              </div>
 
               {/* Info */}
               <div style={{ padding: '12px 14px' }}>
