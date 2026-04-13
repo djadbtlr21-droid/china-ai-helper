@@ -100,9 +100,9 @@ export default function Home() {
 
       {/* Header */}
       <header style={{ padding: '20px 20px 8px' }}>
-        <p style={{ margin: 0, fontSize: '0.7rem', fontWeight: 700,
-          color: 'var(--gold)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-          이우 한인을 위한
+        <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700,
+          color: 'white', letterSpacing: '0.02em' }}>
+          이우 거주 한인을 위한
         </p>
         <h1 style={{ margin: '3px 0 0', fontSize: '1.4rem', fontWeight: 700,
           fontFamily: 'Noto Serif KR', color: 'var(--cream)', letterSpacing: '-0.01em' }}>
