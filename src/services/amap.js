@@ -70,6 +70,29 @@ export function formatAmapForPrompt(places) {
     '\n[위 목록에 없는 장소는 절대 언급하지 말 것]';
 }
 
+export const yiwuAreas = [
+  { nameKo: '강남사구 (한인 밀집)', nameZh: '江南四区' },
+  { nameKo: '첸청소구 (한인 거주)', nameZh: '前成小区' },
+  { nameKo: '푸텐 시장', nameZh: '义乌国际商贸城' },
+  { nameKo: '신광휘 쇼핑몰', nameZh: '新光汇购物中心' },
+  { nameKo: '이우천지', nameZh: '义乌天地' },
+  { nameKo: '빈왕 야시장', nameZh: '宾王夜市' },
+];
+
+export function getRelevantAreas(query) {
+  if (!query) return yiwuAreas.slice(0, 4);
+  if (query.includes('한식') || query.includes('한국') || query.includes('식당') || query.includes('맛집')) {
+    return yiwuAreas.filter(a => ['江南四区','前成小区'].includes(a.nameZh));
+  }
+  if (query.includes('쇼핑') || query.includes('마트') || query.includes('시장')) {
+    return yiwuAreas.filter(a => ['义乌国际商贸城','新光汇购物中心','义乌天地'].includes(a.nameZh));
+  }
+  if (query.includes('야식') || query.includes('꼬치') || query.includes('야시장')) {
+    return yiwuAreas.filter(a => ['宾王夜市'].includes(a.nameZh));
+  }
+  return yiwuAreas.slice(0, 4);
+}
+
 export function openAmapSearch(keyword) {
   const encoded = encodeURIComponent(keyword);
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);

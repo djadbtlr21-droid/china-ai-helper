@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { callAI, saveHistory } from '../services/ai';
-import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch } from '../services/amap';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch, getRelevantAreas } from '../services/amap';
 
 export default function ChatV2() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [chatAmapResults, setChatAmapResults] = useState({});
+  const [locationMessageIds, setLocationMessageIds] = useState(new Set());
+  const [lastUserMessage, setLastUserMessage] = useState('');
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -23,7 +25,9 @@ export default function ChatV2() {
 
     let amapContext = '';
     let places = [];
-    if (isLocationQuery(msg)) {
+    const isLocation = isLocationQuery(msg);
+    if (isLocation) {
+      setLastUserMessage(msg);
       places = await searchAmapPlaces(msg);
       if (places.length > 0) amapContext = formatAmapForPrompt(places);
     }
@@ -33,6 +37,9 @@ export default function ChatV2() {
       const msgId = Date.now();
       const aiMsg = { role: 'ai', content: reply, id: msgId };
       setMessages(prev => [...prev, aiMsg]);
+      if (isLocation) {
+        setLocationMessageIds(prev => new Set([...prev, msgId]));
+      }
       if (places.length > 0) setChatAmapResults(prev => ({ ...prev, [msgId]: places }));
       saveHistory({ type: 'chat', question: msg, answer: reply });
     } catch (err) {
@@ -153,40 +160,23 @@ export default function ChatV2() {
                     </div>
                   </div>
 
-                  {/* Amap suggestion card */}
-                  {chatAmapResults[m.id]?.length > 0 && (
+                  {/* Area suggestion card */}
+                  {locationMessageIds.has(m.id) && (
                     <div style={{
                       background: 'rgba(212,175,55,0.08)',
                       border: '1px solid rgba(212,175,55,0.2)',
                       borderRadius: 14,
-                      padding: '10px 14px',
+                      padding: '12px 14px',
                       marginTop: 10,
                     }}>
-                      <p style={{
-                        margin: '0 0 8px',
-                        fontSize: '0.82rem',
-                        color: 'var(--gold)',
-                        fontWeight: 600
-                      }}>
-                        🗺️ 고덕지도에서 위치를 확인해보시겠어요?
+                      <p style={{ margin:'0 0 10px', fontSize:'0.82rem', color:'var(--gold)', fontWeight:700 }}>
+                        🗺️ 이우에서 이런 곳은 어떠세요?
                       </p>
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {chatAmapResults[m.id]?.slice(0, 3).map((place, i) => (
-                          <button
-                            key={i}
-                            onClick={() => openAmapSearch(place.name)}
-                            style={{
-                              background: 'linear-gradient(135deg, #C41E3A, #8B0000)',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: 100,
-                              padding: '6px 14px',
-                              fontSize: '0.75rem',
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                              fontFamily: 'Noto Sans KR'
-                            }}>
-                            📍 {place.name}
+                      <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                        {getRelevantAreas(lastUserMessage).map((area, i) => (
+                          <button key={i} onClick={() => openAmapSearch(area.nameZh)}
+                            style={{ background:'rgba(196,30,58,0.15)', border:'1px solid rgba(196,30,58,0.3)', borderRadius:100, padding:'7px 14px', fontSize:'0.78rem', fontWeight:600, color:'var(--cream)', cursor:'pointer', fontFamily:'Noto Sans KR' }}>
+                            📍 {area.nameKo}
                           </button>
                         ))}
                       </div>

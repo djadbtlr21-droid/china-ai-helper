@@ -3,7 +3,7 @@ import Lantern from '../components/Lantern';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Toast from '../components/Toast';
 import { callAI, compressImage, compressThumbnail, saveHistory } from '../services/ai';
-import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch } from '../services/amap';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch, getRelevantAreas } from '../services/amap';
 
 const quickQuestions = [
   { emoji: '🍜', text: '이게 무슨 음식?' },
@@ -257,58 +257,15 @@ export default function Home() {
         </div>
       )}
 
-      {/* Amap suggestion card */}
-      {amapPlaces.length > 0 && (
-        <div className="card fade" style={{
-          margin: '0 10px 14px',
-          padding: 14,
-          background: 'rgba(212,175,55,0.06)',
-          border: '1px solid rgba(212,175,55,0.2)'
-        }}>
-          <p style={{
-            margin: '0 0 10px',
-            fontSize: '0.85rem',
-            color: 'var(--gold)',
-            fontWeight: 700
-          }}>
-            🗺️ 고덕지도에서 위치를 확인해보시겠어요?
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {amapPlaces.slice(0, 3).map((place, i) => (
-              <button
-                key={i}
-                onClick={() => openAmapSearch(place.name)}
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  background: i === 0
-                    ? 'linear-gradient(135deg, #C41E3A, #8B0000)'
-                    : 'rgba(196,30,58,0.15)',
-                  color: i === 0 ? 'white' : 'var(--crimson)',
-                  border: i === 0 ? 'none' : '1px solid rgba(196,30,58,0.3)',
-                  borderRadius: 12,
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  fontFamily: 'Noto Sans KR',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  textAlign: 'left'
-                }}>
-                📍 {place.name}
-                {place.address && (
-                  <span style={{
-                    fontSize: '0.7rem',
-                    opacity: 0.8,
-                    marginLeft: 'auto',
-                    fontWeight: 400
-                  }}>
-                    {typeof place.address === 'string'
-                      ? place.address.slice(0, 15) + '...'
-                      : ''}
-                  </span>
-                )}
+      {/* Area suggestion card */}
+      {answer && isLocationQuery(question) && (
+        <div className="card fade" style={{ margin:'0 10px 14px', padding:14, background:'rgba(212,175,55,0.06)', border:'1px solid rgba(212,175,55,0.2)' }}>
+          <p style={{ margin:'0 0 10px', fontSize:'0.85rem', color:'var(--gold)', fontWeight:700 }}>🗺️ 이우에서 이런 곳은 어떠세요?</p>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+            {getRelevantAreas(question).map((area, i) => (
+              <button key={i} onClick={() => openAmapSearch(area.nameZh)}
+                style={{ background:'rgba(196,30,58,0.15)', border:'1px solid rgba(196,30,58,0.3)', borderRadius:100, padding:'7px 14px', fontSize:'0.78rem', fontWeight:600, color:'var(--cream)', cursor:'pointer', fontFamily:'Noto Sans KR' }}>
+                📍 {area.nameKo}
               </button>
             ))}
           </div>
