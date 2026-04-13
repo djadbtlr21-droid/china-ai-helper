@@ -3,7 +3,7 @@ import Lantern from '../components/Lantern';
 import LoadingOverlay from '../components/LoadingOverlay';
 import Toast from '../components/Toast';
 import { callAI, compressImage, compressThumbnail, saveHistory } from '../services/ai';
-import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch } from '../services/amap';
 
 const quickQuestions = [
   { emoji: '🍜', text: '이게 무슨 음식?' },
@@ -257,79 +257,61 @@ export default function Home() {
         </div>
       )}
 
-      {/* Amap place results */}
+      {/* Amap suggestion card */}
       {amapPlaces.length > 0 && (
-        <div className="card fade" style={{ margin: '0 10px 16px', padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <span style={{ fontSize: '1.1rem' }}>📍</span>
-            <span style={{ fontWeight: 700, color: 'var(--crimson)', fontSize: '0.88rem' }}>
-              고덕지도 검색 결과
-            </span>
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
-              실시간
-            </span>
-          </div>
-          <div className="gold-divider" />
-
-          {/* 바로 길찾기 버튼 */}
-          <button
-            onClick={() => openAmapNavi(amapPlaces[0].name, amapPlaces[0].location)}
-            style={{
-              width: '100%', padding: '12px',
-              background: 'linear-gradient(135deg, #C41E3A, #8B0000)',
-              color: 'white', border: 'none', borderRadius: 14,
-              fontSize: '0.88rem', fontWeight: 700,
-              cursor: 'pointer', marginBottom: 12,
-              boxShadow: '0 4px 0 rgba(139,0,0,0.4)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8
-            }}>
-            🗺️ 고덕지도로 바로 길찾기 → {amapPlaces[0].name}
-          </button>
-
-          {amapPlaces.map((place, i) => (
-            <div key={i} style={{
-              padding: '10px 0',
-              borderBottom: i < amapPlaces.length - 1 ? '1px solid var(--card-border)' : 'none'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
-                  <p style={{ margin: '0 0 3px', fontWeight: 700, fontSize: '0.9rem',
-                    color: 'var(--text-primary)' }}>
-                    {i === 0 ? '🥇 ' : `${i+1}. `}{place.name}
-                  </p>
-                  <p style={{ margin: '0 0 3px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                    📍 {place.address || '주소 없음'}
-                  </p>
-                  {place.tel && (
-                    <p style={{ margin: '0 0 3px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                      📞 {place.tel}
-                    </p>
-                  )}
-                  <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                    {place.rating && (
-                      <span style={{ fontSize: '0.72rem', color: 'var(--gold)',
-                        background: 'var(--gold-soft)', padding: '2px 8px', borderRadius: 100 }}>
-                        ⭐ {place.rating}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {place.location && (
-                  <button
-                    onClick={() => openAmapNavi(place.name, place.location)}
-                    style={{
-                      background: 'linear-gradient(135deg, var(--crimson), var(--crimson-dark))',
-                      color: 'white', border: 'none', borderRadius: 100,
-                      padding: '8px 14px', fontSize: '0.75rem', fontWeight: 700,
-                      cursor: 'pointer', flexShrink: 0, marginLeft: 8,
-                      boxShadow: '0 3px 0 rgba(139,0,0,0.3)'
-                    }}>
-                    🗺️ 길찾기
-                  </button>
+        <div className="card fade" style={{
+          margin: '0 10px 14px',
+          padding: 14,
+          background: 'rgba(212,175,55,0.06)',
+          border: '1px solid rgba(212,175,55,0.2)'
+        }}>
+          <p style={{
+            margin: '0 0 10px',
+            fontSize: '0.85rem',
+            color: 'var(--gold)',
+            fontWeight: 700
+          }}>
+            🗺️ 고덕지도에서 위치를 확인해보시겠어요?
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {amapPlaces.slice(0, 3).map((place, i) => (
+              <button
+                key={i}
+                onClick={() => openAmapSearch(place.name)}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  background: i === 0
+                    ? 'linear-gradient(135deg, #C41E3A, #8B0000)'
+                    : 'rgba(196,30,58,0.15)',
+                  color: i === 0 ? 'white' : 'var(--crimson)',
+                  border: i === 0 ? 'none' : '1px solid rgba(196,30,58,0.3)',
+                  borderRadius: 12,
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  fontFamily: 'Noto Sans KR',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  textAlign: 'left'
+                }}>
+                📍 {place.name}
+                {place.address && (
+                  <span style={{
+                    fontSize: '0.7rem',
+                    opacity: 0.8,
+                    marginLeft: 'auto',
+                    fontWeight: 400
+                  }}>
+                    {typeof place.address === 'string'
+                      ? place.address.slice(0, 15) + '...'
+                      : ''}
+                  </span>
                 )}
-              </div>
-            </div>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

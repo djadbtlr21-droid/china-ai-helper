@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { callAI, saveHistory } from '../services/ai';
-import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch } from '../services/amap';
 
 export default function Chat() {
   const [messages, setMessages] = useState([]);
@@ -161,68 +161,43 @@ export default function Chat() {
                     {m.content}
                   </div>
 
-                  {/* Amap results */}
+                  {/* Amap suggestion card */}
                   {chatAmapResults[m.id]?.length > 0 && (
-                    <div style={{ marginTop: 8 }}>
-                      {/* 바로 길찾기 버튼 */}
-                      <button
-                        onClick={() => openAmapNavi(
-                          chatAmapResults[m.id][0].name,
-                          chatAmapResults[m.id][0].location
-                        )}
-                        style={{
-                          width: '100%', padding: '12px',
-                          background: 'linear-gradient(135deg, #C41E3A, #8B0000)',
-                          color: 'white', border: 'none', borderRadius: 14,
-                          fontSize: '0.88rem', fontWeight: 700,
-                          cursor: 'pointer', marginBottom: 8,
-                          boxShadow: '0 4px 0 rgba(139,0,0,0.4)',
-                          display: 'flex', alignItems: 'center',
-                          justifyContent: 'center', gap: 8,
-                          fontFamily: 'Noto Sans KR'
-                        }}>
-                        🗺️ 고덕지도로 바로 길찾기 → {chatAmapResults[m.id][0].name}
-                      </button>
-
-                      {/* 장소 카드 */}
-                      {chatAmapResults[m.id].map((place, i) => (
-                        <div key={i} style={{
-                          background: 'var(--cream)',
-                          borderRadius: 12, padding: '10px 14px',
-                          marginBottom: 6
-                        }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div style={{ flex: 1 }}>
-                              <p style={{ margin: '0 0 2px', fontWeight: 700, fontSize: '0.85rem', color: 'var(--ink)' }}>
-                                {i === 0 ? '🥇 ' : `${i + 1}. `}{place.name}
-                              </p>
-                              <p style={{ margin: 0, fontSize: '0.75rem', color: '#666' }}>
-                                📍 {place.address}
-                              </p>
-                              {place.tel && (
-                                <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: '#888' }}>
-                                  📞 {place.tel}
-                                </p>
-                              )}
-                              {place.rating && (
-                                <span style={{ fontSize: '0.7rem', color: '#D4AF37' }}>⭐ {place.rating}</span>
-                              )}
-                            </div>
-                            {place.location && (
-                              <button onClick={() => openAmapNavi(place.name, place.location)}
-                                style={{
-                                  background: '#C41E3A', color: 'white', border: 'none',
-                                  borderRadius: 100, padding: '6px 12px',
-                                  fontSize: '0.72rem', fontWeight: 700,
-                                  cursor: 'pointer', flexShrink: 0, marginLeft: 8,
-                                  fontFamily: 'Noto Sans KR'
-                                }}>
-                                🗺️ 길찾기
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                    <div style={{
+                      background: 'rgba(212,175,55,0.1)',
+                      border: '1px solid rgba(212,175,55,0.25)',
+                      borderRadius: 14,
+                      padding: '10px 14px',
+                      marginTop: 8,
+                    }}>
+                      <p style={{
+                        margin: '0 0 8px',
+                        fontSize: '0.82rem',
+                        color: 'var(--gold)',
+                        fontWeight: 600
+                      }}>
+                        🗺️ 고덕지도에서 위치를 확인해보시겠어요?
+                      </p>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        {chatAmapResults[m.id]?.slice(0, 3).map((place, i) => (
+                          <button
+                            key={i}
+                            onClick={() => openAmapSearch(place.name)}
+                            style={{
+                              background: 'linear-gradient(135deg, #C41E3A, #8B0000)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: 100,
+                              padding: '6px 14px',
+                              fontSize: '0.75rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              fontFamily: 'Noto Sans KR'
+                            }}>
+                            📍 {place.name}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

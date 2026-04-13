@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { placeCategories, places, filterPlaces } from '../data/places';
-import { openAmapSearch, openAmapNavi } from '../services/amap';
+import { openAmapSearch } from '../services/amap';
 
 const subCategories = {
   '식당': ['전체', '한식', '중식'],
@@ -20,17 +20,6 @@ export default function FavoritesV2() {
   function handleCatChange(catId) {
     setSelectedCat(catId);
     setSelectedSub('전체');
-  }
-
-  function handleNav(place) {
-    if (place.coordinates) {
-      openAmapNavi(
-        place.nameZh || place.nameKo,
-        `${place.coordinates.lng},${place.coordinates.lat}`
-      );
-    } else {
-      openAmapSearch(place.nameZh || place.nameKo);
-    }
   }
 
   const catEmoji = placeCategories.find(c => c.id === selectedCat)?.emoji || '📍';
@@ -217,14 +206,14 @@ export default function FavoritesV2() {
 
                     {/* Navigation button */}
                     <button
-                      onClick={() => handleNav(place)}
+                      onClick={() => openAmapSearch(place.nameZh || place.nameKo)}
                       className="v2-btn-primary"
                       style={{
                         width: '100%', padding: '12px',
                         fontSize: '0.85rem',
                       }}
                     >
-                      🗺️ 고덕지도로 길찾기
+                      🗺️ 고덕지도에서 검색
                     </button>
                   </div>
                 </div>

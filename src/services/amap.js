@@ -1,5 +1,25 @@
 const AMAP_KEY = import.meta.env.VITE_AMAP_KEY || '01cd2af677cc41c3cc14e03973279fc3';
 
+const keywordMap = {
+  '한국식당': '韩国料理', '한식': '韩国料理', '식당': '餐厅',
+  '맛집': '餐厅', '음식점': '餐厅', '고기': '烤肉',
+  '삼겹살': '五花肉烤肉', '치킨': '炸鸡', '족발': '猪蹄',
+  '병원': '医院', '약국': '药店', '마트': '超市',
+  '편의점': '便利店', '카페': '咖啡', '커피': '咖啡',
+  '미용실': '美发', '네일': '美甲', '마사지': '按摩',
+  '헬스': '健身房', '당구': '台球', '골프': '高尔夫',
+  '쇼핑몰': '购物中心', '시장': '市场', '은행': '银行',
+  '학교': '学校', '공원': '公园', '지하철': '地铁',
+  '훠궈': '火锅', '마라탕': '麻辣烫', '꼬치': '烤串',
+};
+
+export function translateKeyword(text) {
+  for (const [ko, zh] of Object.entries(keywordMap)) {
+    if (text.includes(ko)) return zh;
+  }
+  return text;
+}
+
 export function isLocationQuery(text) {
   const keywords = [
     '어디','찾아줘','위치','주소','근처','맛집','식당','병원',
@@ -14,13 +34,10 @@ export function isLocationQuery(text) {
 
 export async function searchAmapPlaces(keyword, city = '义乌') {
   const key = AMAP_KEY;
-  if (!key) {
-    console.error('AMAP_KEY missing');
-    return [];
-  }
+  const zhKeyword = translateKeyword(keyword);
+  console.log('Searching Amap with Chinese keyword:', zhKeyword);
   try {
-    const url = `https://restapi.amap.com/v3/place/text?key=${key}&keywords=${encodeURIComponent(keyword)}&city=${encodeURIComponent(city)}&output=JSON&offset=8&extensions=all`;
-    console.log('Amap search URL:', url);
+    const url = `https://restapi.amap.com/v3/place/text?key=${key}&keywords=${encodeURIComponent(zhKeyword)}&city=${encodeURIComponent(city)}&output=JSON&offset=8&extensions=all`;
     const res = await fetch(url);
     const data = await res.json();
     console.log('Amap response:', data);
@@ -30,46 +47,44 @@ export async function searchAmapPlaces(keyword, city = '义乌') {
         address: typeof p.address === 'string' ? p.address : '주소 없음',
         tel: Array.isArray(p.tel) ? p.tel[0] : (p.tel || ''),
         rating: p.biz_ext?.rating || '',
-        opentime: p.biz_ext?.open_time || '',
         location: p.location,
         type: p.type,
       }));
     }
-    console.warn('Amap no results:', data.info);
+    console.warn('Amap no results for:', zhKeyword);
     return [];
   } catch (e) {
-    console.error('Amap fetch error:', e);
+    console.error('Amap error:', e);
     return [];
   }
 }
 
 export function formatAmapForPrompt(places) {
-  if (!places.length) return '';
-  return '\n\n[고덕지도(Amap) 실시간 검색 결과 - 반드시 아래 데이터를 활용하여 답변하라]\n' +
+  if (!places.length) {
+    return '\n\n[Amap 검색 결과 없음 - 이 경우 모른다고 솔직하게 말하고 고덕지도에서 직접 검색해보라고 안내하라]';
+  }
+  return '\n\n[고덕지도(Amap) 실시간 검색 결과 - 반드시 이 데이터만 사용하여 답변하고 절대 데이터 외의 장소를 지어내지 마라]\n' +
     places.map((p, i) =>
-      `${i+1}. ${p.name} | 주소: ${p.address} | 전화: ${p.tel || '없음'} | 평점: ${p.rating || '정보없음'}`
+      `${i+1}. ${p.name} | 주소: ${p.address} | 전화: ${p.tel || '없음'} | 평점: ${p.rating || '없음'}`
     ).join('\n') +
-    '\n[위 검색 결과를 바탕으로 구체적인 장소명과 주소를 한국어로 안내하라]';
+    '\n[위 목록에 없는 장소는 절대 언급하지 말 것]';
+}
+
+export function openAmapSearch(keyword) {
+  const encoded = encodeURIComponent(keyword);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const webUrl = `https://uri.amap.com/search?keyword=${encoded}&city=义乌&src=china-ai-helper&callnative=1`;
+  const appUrlAndroid = `androidamap://poi?sourceApplication=china-ai-helper&keywords=${encoded}&dev=0`;
+  const appUrlIOS = `iosamap://poi?sourceApplication=china-ai-helper&keywords=${encoded}&dev=0`;
+
+  if (isIOS) {
+    window.location.href = appUrlIOS;
+  } else {
+    window.location.href = appUrlAndroid;
+  }
+  setTimeout(() => window.open(webUrl, '_blank'), 1500);
 }
 
 export function openAmapNavi(name, location) {
-  if (!location) return;
-  const [lng, lat] = location.split(',');
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const appUrl = isIOS
-    ? `iosamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`
-    : `androidamap://navi?sourceApplication=중국AI&lat=${lat}&lon=${lng}&dev=0&style=2`;
-  const webUrl = `https://uri.amap.com/navigation?to=${lng},${lat},${encodeURIComponent(name)}&mode=car&src=china-ai-helper&callnative=1`;
-  window.location.href = appUrl;
-  setTimeout(() => window.open(webUrl, '_blank'), 1500);
-}
-
-export function openAmapSearch(name) {
-  const webUrl = `https://uri.amap.com/search?keyword=${encodeURIComponent(name)}&src=china-ai-helper&callnative=1`;
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const appUrl = isIOS
-    ? `iosamap://poi?sourceApplication=中国AI&keywords=${encodeURIComponent(name)}`
-    : `androidamap://poi?sourceApplication=中国AI&keywords=${encodeURIComponent(name)}`;
-  window.location.href = appUrl;
-  setTimeout(() => window.open(webUrl, '_blank'), 1500);
+  openAmapSearch(name);
 }

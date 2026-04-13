@@ -3,7 +3,7 @@ import Lantern from '../components/Lantern';
 import LoadingOverlayV2 from '../components/LoadingOverlayV2';
 import Toast from '../components/Toast';
 import { callAI, compressImage, compressThumbnail, saveHistory } from '../services/ai';
-import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapNavi } from '../services/amap';
+import { isLocationQuery, searchAmapPlaces, formatAmapForPrompt, openAmapSearch } from '../services/amap';
 
 const quickQuestions = [
   { emoji: '🍜', text: '이게 무슨 음식?' },
@@ -273,75 +273,60 @@ export default function HomeV2() {
         </div>
       )}
 
-      {/* Amap place results */}
+      {/* Amap suggestion card */}
       {amapPlaces.length > 0 && (
-        <div className="v2-card v2-animate" style={{ margin: '0 10px 16px' }}>
-          <div className="v2-card-inner" style={{ padding: 18 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: 10,
-                background: 'linear-gradient(135deg, rgba(196,30,58,0.15), rgba(212,175,55,0.1))',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '1rem',
-              }}>📍</div>
-              <span style={{ fontWeight: 700, color: 'var(--crimson)', fontSize: '0.88rem' }}>
-                고덕지도 검색 결과
-              </span>
-              <span className="v2-eyebrow" style={{ marginLeft: 'auto', marginBottom: 0, padding: '2px 8px', fontSize: '0.62rem' }}>
-                실시간
-              </span>
-            </div>
-            <div className="v2-divider" />
-
-            {/* Top result nav button */}
-            <button
-              onClick={() => openAmapNavi(amapPlaces[0].name, amapPlaces[0].location)}
-              className="v2-btn-primary"
-              style={{ width: '100%', marginBottom: 14, fontSize: '0.88rem', padding: '13px' }}
-            >
-              🗺️ 고덕지도로 바로 길찾기 → {amapPlaces[0].name}
-            </button>
-
-            <div className="v2-stagger">
-              {amapPlaces.map((place, i) => (
-                <div key={i} style={{
-                  padding: '12px 0',
-                  borderBottom: i < amapPlaces.length - 1 ? '1px solid rgba(212,175,55,0.08)' : 'none'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ margin: '0 0 3px', fontWeight: 700, fontSize: '0.9rem', color: 'var(--cream)' }}>
-                        {i === 0 ? '🥇 ' : `${i+1}. `}{place.name}
-                      </p>
-                      <p style={{ margin: '0 0 3px', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
-                        📍 {place.address || '주소 없음'}
-                      </p>
-                      {place.tel && (
-                        <p style={{ margin: '0 0 3px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                          📞 {place.tel}
-                        </p>
-                      )}
-                      {place.rating && (
-                        <span className="v2-tag" style={{ marginTop: 4, display: 'inline-block' }}>
-                          ⭐ {place.rating}
-                        </span>
-                      )}
-                    </div>
-                    {place.location && (
-                      <button
-                        onClick={() => openAmapNavi(place.name, place.location)}
-                        className="v2-btn-primary"
-                        style={{
-                          padding: '8px 14px', fontSize: '0.72rem',
-                          flexShrink: 0, marginLeft: 8,
-                          boxShadow: '0 3px 0 rgba(139,0,0,0.3)',
-                        }}
-                      >
-                        🗺️ 길찾기
-                      </button>
-                    )}
-                  </div>
-                </div>
+        <div className="v2-card v2-animate" style={{ margin: '0 10px 14px' }}>
+          <div className="v2-card-inner" style={{
+            padding: 14,
+            background: 'rgba(212,175,55,0.04)',
+          }}>
+            <p style={{
+              margin: '0 0 10px',
+              fontSize: '0.85rem',
+              color: 'var(--gold)',
+              fontWeight: 700
+            }}>
+              🗺️ 고덕지도에서 위치를 확인해보시겠어요?
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {amapPlaces.slice(0, 3).map((place, i) => (
+                <button
+                  key={i}
+                  onClick={() => openAmapSearch(place.name)}
+                  className={i === 0 ? 'v2-btn-primary' : ''}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    background: i === 0
+                      ? undefined
+                      : 'rgba(196,30,58,0.12)',
+                    color: i === 0 ? 'white' : 'var(--crimson)',
+                    border: i === 0 ? undefined : '1px solid rgba(196,30,58,0.25)',
+                    borderRadius: 12,
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    fontFamily: 'Noto Sans KR',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    textAlign: 'left',
+                    ...(i === 0 ? {} : { boxShadow: 'none' }),
+                  }}>
+                  📍 {place.name}
+                  {place.address && (
+                    <span style={{
+                      fontSize: '0.7rem',
+                      opacity: 0.8,
+                      marginLeft: 'auto',
+                      fontWeight: 400
+                    }}>
+                      {typeof place.address === 'string'
+                        ? place.address.slice(0, 15) + '...'
+                        : ''}
+                    </span>
+                  )}
+                </button>
               ))}
             </div>
           </div>
