@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Encyclopedia from './pages/Encyclopedia';
 import Chat from './pages/Chat';
 import History from './pages/History';
+import Favorites from './pages/Favorites';
 import Settings from './pages/Settings';
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
     encyclopedia: <Encyclopedia onAskAI={() => setPage('home')} />,
     chat: <Chat />,
     history: <History />,
+    favorites: <Favorites />,
     settings: <Settings />,
   };
 
