@@ -1,10 +1,39 @@
 import { useState } from 'react';
-import { placeCategories, places } from '../data/places';
+import { placeCategories, places, filterPlaces } from '../data/places';
 import { openAmapSearch, openAmapNavi } from '../services/amap';
 
+const subCategories = {
+  '식당': ['전체', '한식', '중식'],
+  '운동': ['전체', '당구', '골프'],
+  '쇼핑': ['전체', '쇼핑몰', '마트'],
+};
+
 export default function FavoritesV2() {
-  const [selectedCat, setSelectedCat] = useState('restaurant');
-  const filtered = places.filter(p => p.category === selectedCat);
+  const [selectedCat, setSelectedCat] = useState('식당');
+  const [selectedSub, setSelectedSub] = useState('전체');
+
+  const filtered = filterPlaces({
+    category: selectedCat,
+    subcategory: selectedSub,
+  });
+
+  function handleCatChange(catId) {
+    setSelectedCat(catId);
+    setSelectedSub('전체');
+  }
+
+  function handleNav(place) {
+    if (place.coordinates) {
+      openAmapNavi(
+        place.nameZh || place.nameKo,
+        `${place.coordinates.lng},${place.coordinates.lat}`
+      );
+    } else {
+      openAmapSearch(place.nameZh || place.nameKo);
+    }
+  }
+
+  const catEmoji = placeCategories.find(c => c.id === selectedCat)?.emoji || '📍';
 
   return (
     <div className="v2-page">
@@ -21,14 +50,53 @@ export default function FavoritesV2() {
 
       {/* Category Pills */}
       <div className="v2-scroll-hide v2-animate v2-animate-delay-1"
-        style={{ display: 'flex', gap: 8, padding: '0 10px 14px', overflowX: 'auto' }}>
+        style={{ display: 'flex', gap: 8, padding: '0 10px 8px', overflowX: 'auto' }}>
         {placeCategories.map(cat => (
           <button key={cat.id}
             className={`v2-pill ${selectedCat === cat.id ? 'active' : ''}`}
-            onClick={() => setSelectedCat(cat.id)}>
+            onClick={() => handleCatChange(cat.id)}>
             {cat.emoji} {cat.label}
           </button>
         ))}
+      </div>
+
+      {/* Subcategory Pills */}
+      {subCategories[selectedCat] && (
+        <div className="v2-scroll-hide v2-animate v2-animate-delay-2"
+          style={{ display: 'flex', gap: 6, padding: '0 10px 12px', overflowX: 'auto' }}>
+          {subCategories[selectedCat].map(sub => (
+            <button
+              key={sub}
+              onClick={() => setSelectedSub(sub)}
+              style={{
+                flexShrink: 0,
+                padding: '5px 14px',
+                borderRadius: 100,
+                border: selectedSub === sub
+                  ? '1px solid var(--gold)'
+                  : '1px solid rgba(212,175,55,0.15)',
+                background: selectedSub === sub
+                  ? 'rgba(212,175,55,0.12)'
+                  : 'transparent',
+                color: selectedSub === sub ? 'var(--gold)' : 'var(--text-muted)',
+                fontSize: '0.75rem',
+                fontWeight: selectedSub === sub ? 700 : 400,
+                cursor: 'pointer',
+                fontFamily: 'Noto Sans KR',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}>
+              {sub}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Result count */}
+      <div className="v2-animate v2-animate-delay-3" style={{ padding: '0 10px 8px' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          총 {filtered.length}개 장소
+        </span>
       </div>
 
       {/* Place Cards */}
@@ -48,7 +116,6 @@ export default function FavoritesV2() {
           <div className="v2-stagger">
             {filtered.map(place => (
               <div key={place.id} className="v2-card" style={{ marginBottom: 12 }}>
-                {/* Inner bezel with no padding — image takes full width */}
                 <div style={{
                   background: 'var(--bezel-inner-bg)',
                   borderRadius: 'var(--bezel-radius-inner)',
@@ -57,8 +124,8 @@ export default function FavoritesV2() {
                   backdropFilter: 'blur(16px)',
                 }}>
                   {/* Image area */}
-                  {place.image ? (
-                    <img src={place.image} alt={place.nameKo}
+                  {place.images?.[0] ? (
+                    <img src={place.images[0]} alt={place.nameKo}
                       style={{ width: '100%', height: 140, objectFit: 'cover' }}
                       loading="lazy" />
                   ) : (
@@ -68,7 +135,7 @@ export default function FavoritesV2() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '2.5rem',
                     }}>
-                      {place.emoji}
+                      {catEmoji}
                     </div>
                   )}
 
@@ -87,11 +154,52 @@ export default function FavoritesV2() {
                       {place.nameZh}
                     </p>
                     <p style={{
-                      margin: '0 0 6px', fontSize: '0.78rem',
+                      margin: '0 0 4px', fontSize: '0.78rem',
                       color: 'var(--text-secondary)',
                     }}>
                       📍 {place.addressKo}
                     </p>
+                    {place.hours && (
+                      <p style={{
+                        margin: '0 0 4px', fontSize: '0.75rem',
+                        color: 'var(--text-secondary)',
+                      }}>
+                        🕐 {place.hours}
+                      </p>
+                    )}
+                    {place.priceRange && (
+                      <p style={{
+                        margin: '0 0 4px', fontSize: '0.75rem',
+                        color: 'var(--text-secondary)',
+                      }}>
+                        💰 {place.priceRange}
+                      </p>
+                    )}
+                    {place.rating > 0 && (
+                      <p style={{
+                        margin: '0 0 4px', fontSize: '0.75rem',
+                        color: 'var(--gold)',
+                      }}>
+                        ⭐ {place.rating} ({place.reviews}명 평가)
+                      </p>
+                    )}
+
+                    {/* Distance + Drive time badges */}
+                    <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                      {place.distance && (
+                        <span className="v2-tag">
+                          📏 {place.distance}
+                        </span>
+                      )}
+                      {place.driveTime && (
+                        <span className="v2-tag" style={{
+                          background: 'rgba(196,30,58,0.08)',
+                        }}>
+                          🚗 {place.driveTime}
+                        </span>
+                      )}
+                    </div>
+
                     {place.description && (
                       <p style={{
                         margin: '0 0 10px', fontSize: '0.78rem',
@@ -109,10 +217,7 @@ export default function FavoritesV2() {
 
                     {/* Navigation button */}
                     <button
-                      onClick={() => place.location
-                        ? openAmapNavi(place.nameZh || place.nameKo, place.location)
-                        : openAmapSearch(place.nameZh || place.nameKo)
-                      }
+                      onClick={() => handleNav(place)}
                       className="v2-btn-primary"
                       style={{
                         width: '100%', padding: '12px',

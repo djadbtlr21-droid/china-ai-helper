@@ -1,11 +1,39 @@
 import { useState } from 'react';
-import { placeCategories, places } from '../data/places';
+import { placeCategories, places, filterPlaces } from '../data/places';
 import { openAmapSearch, openAmapNavi } from '../services/amap';
 
-export default function Favorites() {
-  const [selectedCat, setSelectedCat] = useState('restaurant');
+const subCategories = {
+  '식당': ['전체', '한식', '중식'],
+  '운동': ['전체', '당구', '골프'],
+  '쇼핑': ['전체', '쇼핑몰', '마트'],
+};
 
-  const filtered = places.filter(p => p.category === selectedCat);
+export default function Favorites() {
+  const [selectedCat, setSelectedCat] = useState('식당');
+  const [selectedSub, setSelectedSub] = useState('전체');
+
+  const filtered = filterPlaces({
+    category: selectedCat,
+    subcategory: selectedSub,
+  });
+
+  function handleCatChange(catId) {
+    setSelectedCat(catId);
+    setSelectedSub('전체');
+  }
+
+  function handleNav(place) {
+    if (place.coordinates) {
+      openAmapNavi(
+        place.nameZh || place.nameKo,
+        `${place.coordinates.lng},${place.coordinates.lat}`
+      );
+    } else {
+      openAmapSearch(place.nameZh || place.nameKo);
+    }
+  }
+
+  const catEmoji = placeCategories.find(c => c.id === selectedCat)?.emoji || '📍';
 
   return (
     <div style={{ paddingBottom: 80 }}>
@@ -30,13 +58,13 @@ export default function Favorites() {
 
       {/* Category Pills */}
       <div style={{
-        display: 'flex', gap: 8, padding: '0 10px 12px',
+        display: 'flex', gap: 8, padding: '0 10px 8px',
         overflowX: 'auto', scrollbarWidth: 'none'
       }}>
         {placeCategories.map(cat => (
           <button
             key={cat.id}
-            onClick={() => setSelectedCat(cat.id)}
+            onClick={() => handleCatChange(cat.id)}
             style={{
               flexShrink: 0,
               padding: '8px 16px',
@@ -58,6 +86,46 @@ export default function Favorites() {
         ))}
       </div>
 
+      {/* Subcategory Pills */}
+      {subCategories[selectedCat] && (
+        <div style={{
+          display: 'flex', gap: 6, padding: '0 10px 12px',
+          overflowX: 'auto', scrollbarWidth: 'none'
+        }}>
+          {subCategories[selectedCat].map(sub => (
+            <button
+              key={sub}
+              onClick={() => setSelectedSub(sub)}
+              style={{
+                flexShrink: 0,
+                padding: '5px 14px',
+                borderRadius: 100,
+                border: selectedSub === sub
+                  ? '1px solid var(--gold)'
+                  : '1px solid rgba(212,175,55,0.2)',
+                background: selectedSub === sub
+                  ? 'rgba(212,175,55,0.15)'
+                  : 'transparent',
+                color: selectedSub === sub ? 'var(--gold)' : 'var(--text-muted)',
+                fontSize: '0.75rem',
+                fontWeight: selectedSub === sub ? 700 : 400,
+                cursor: 'pointer',
+                fontFamily: 'Noto Sans KR',
+                whiteSpace: 'nowrap'
+              }}>
+              {sub}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Result count */}
+      <div style={{ padding: '0 10px 8px' }}>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          총 {filtered.length}개 장소
+        </span>
+      </div>
+
       {/* Place Cards */}
       <div style={{ padding: '0 10px' }}>
         {filtered.length === 0 ? (
@@ -75,8 +143,8 @@ export default function Favorites() {
               style={{ marginBottom: 10, padding: 0, overflow: 'hidden' }}>
 
               {/* Image area */}
-              {place.image ? (
-                <img src={place.image} alt={place.nameKo}
+              {place.images?.[0] ? (
+                <img src={place.images[0]} alt={place.nameKo}
                   style={{ width: '100%', height: 140, objectFit: 'cover' }} />
               ) : (
                 <div style={{
@@ -85,54 +153,94 @@ export default function Favorites() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: '2.5rem'
                 }}>
-                  {place.emoji}
+                  {catEmoji}
                 </div>
               )}
 
               {/* Info */}
               <div style={{ padding: '12px 14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div style={{ flex: 1 }}>
-                    <p style={{
-                      margin: '0 0 2px', fontWeight: 700,
-                      fontSize: '0.95rem', color: 'var(--text-primary)'
+                <p style={{
+                  margin: '0 0 2px', fontWeight: 700,
+                  fontSize: '0.95rem', color: 'var(--text-primary)'
+                }}>
+                  {place.nameKo}
+                </p>
+                <p style={{
+                  margin: '0 0 6px', fontSize: '0.72rem',
+                  color: 'var(--text-muted)'
+                }}>
+                  {place.nameZh}
+                </p>
+                <p style={{
+                  margin: '0 0 4px', fontSize: '0.78rem',
+                  color: 'var(--text-secondary)'
+                }}>
+                  📍 {place.addressKo}
+                </p>
+                {place.hours && (
+                  <p style={{
+                    margin: '0 0 4px', fontSize: '0.75rem',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    🕐 {place.hours}
+                  </p>
+                )}
+                {place.priceRange && (
+                  <p style={{
+                    margin: '0 0 4px', fontSize: '0.75rem',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    💰 {place.priceRange}
+                  </p>
+                )}
+                {place.rating > 0 && (
+                  <p style={{
+                    margin: '0 0 4px', fontSize: '0.75rem',
+                    color: 'var(--gold)'
+                  }}>
+                    ⭐ {place.rating} ({place.reviews}명 평가)
+                  </p>
+                )}
+
+                {/* Distance + Drive time badges */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                  {place.distance && (
+                    <span style={{
+                      fontSize: '0.68rem', padding: '2px 8px',
+                      background: 'rgba(212,175,55,0.1)',
+                      borderRadius: 100, color: 'var(--text-muted)'
                     }}>
-                      {place.nameKo}
-                    </p>
-                    <p style={{
-                      margin: '0 0 4px', fontSize: '0.72rem',
-                      color: 'var(--text-muted)'
+                      📏 {place.distance}
+                    </span>
+                  )}
+                  {place.driveTime && (
+                    <span style={{
+                      fontSize: '0.68rem', padding: '2px 8px',
+                      background: 'rgba(196,30,58,0.08)',
+                      borderRadius: 100, color: 'var(--text-muted)'
                     }}>
-                      {place.nameZh}
-                    </p>
-                    <p style={{
-                      margin: '0 0 6px', fontSize: '0.78rem',
-                      color: 'var(--text-secondary)'
-                    }}>
-                      📍 {place.addressKo}
-                    </p>
-                    {place.description && (
-                      <p style={{
-                        margin: '0 0 8px', fontSize: '0.78rem',
-                        color: 'var(--text-secondary)', lineHeight: 1.5
-                      }}>
-                        {place.description}
-                      </p>
-                    )}
-                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                      {place.tags?.map(tag => (
-                        <span key={tag} className="tag">#{tag}</span>
-                      ))}
-                    </div>
-                  </div>
+                      🚗 {place.driveTime}
+                    </span>
+                  )}
+                </div>
+
+                {place.description && (
+                  <p style={{
+                    margin: '0 0 8px', fontSize: '0.78rem',
+                    color: 'var(--text-secondary)', lineHeight: 1.5
+                  }}>
+                    {place.description}
+                  </p>
+                )}
+                <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                  {place.tags?.map(tag => (
+                    <span key={tag} className="tag">#{tag}</span>
+                  ))}
                 </div>
 
                 {/* Navigation button */}
                 <button
-                  onClick={() => place.location
-                    ? openAmapNavi(place.nameZh || place.nameKo, place.location)
-                    : openAmapSearch(place.nameZh || place.nameKo)
-                  }
+                  onClick={() => handleNav(place)}
                   style={{
                     width: '100%', marginTop: 12, padding: '11px',
                     background: 'linear-gradient(135deg, #C41E3A, #8B0000)',

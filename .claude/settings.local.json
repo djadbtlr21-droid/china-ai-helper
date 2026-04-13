@@ -14,7 +14,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(npx vite:*)",
       "Bash(git add:*)",
-      "Bash(git commit -m ':*)"
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
     ]
   }
 }
