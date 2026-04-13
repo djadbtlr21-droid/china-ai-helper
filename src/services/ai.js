@@ -3,7 +3,12 @@ const SYSTEM_PROMPT = `너는 중국 이우(义乌)에 거주하는 한국인을
 마크다운 형식(###, **, -, 등) 절대 사용 금지. 일반 텍스트로만 답변하라.
 중국 현지 음식, 의약품, 표지판, 마트 제품, 생활 정보에 대해 깊이 이해하고 있다.
 이우(义乌) 지역 특화 정보를 우선적으로 제공하라.
-답변은 구체적이고 실용적으로, 최소 200자 이상 작성하라.
+답변 길이 규칙:
+- 단순 사실 확인 질문 (예: 네/아니오 답변): 100자 이상
+- 일반 질문: 200자 이상
+- 장소/맛집/추천 관련 질문: 300자 이상
+- 절대로 문장 중간에 답변을 끊지 마라
+- 반드시 완전한 문장으로 마무리하라
 모를 경우 솔직하게 말하고 고덕지도(Amap)에서 직접 검색해보라고 안내하라.
 Amap 검색 결과가 제공된 경우 반드시 그 데이터만 사용하고 절대 데이터 외의 장소를 지어내지 마라.
 
@@ -42,7 +47,7 @@ export async function callAI(question, base64Image = null, amapContext = '') {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts }],
-        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+        generationConfig: { temperature: 0.7, maxOutputTokens: 3000 }
       })
     }
   );
